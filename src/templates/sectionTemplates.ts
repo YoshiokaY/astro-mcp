@@ -27,8 +27,10 @@ export function generateSectionTemplate(config: SectionConfig): string {
       return generateTechSection(content, components);
     case "concept":
       return generateConceptSection(content, components);
+    case "modal":
+    case "gallery":
     case "videos":
-      return generateVideosSection(content, components);
+      return generateModalSection(content, components);
     default:
       return generateCustomSection(type, content, components);
   }
@@ -193,14 +195,16 @@ function generateQaSection(
 ): string {
   return `---
 /**
- * Q&Aセクションコンポーネント
+ * アコーディオンセクションコンポーネント
+ * 汎用的なアコーディオンUI（開発環境準拠）
+ * 用途: Q&A、FAQ、利用規約、製品仕様、沿革など
  */
 interface Props {
   qa: {
     ttl: string;
     items: {
-      q: string;
-      a: string;
+      ttl: string;
+      content: string;
     }[];
   };
 }
@@ -209,23 +213,24 @@ const { qa } = Astro.props;
 ---
 
 <section class="qa_section">
-  <h2 class="section_ttl" set:html={qa.ttl} />
-  <dl class="qa_list">
+  <h2 class="section_ttl">{qa.ttl}</h2>
+  <div class="accordion_list">
     {
-      qa.items.map((item, index) => (
-        <>
-          <dt class="qa_question">
-            <span class="qa_label">Q</span>
-            {item.q}
-          </dt>
-          <dd class="qa_answer">
-            <span class="qa_label">A</span>
-            {item.a}
-          </dd>
-        </>
+      qa.items.map((item, i) => (
+        <details
+          class={"c_pull accordion_item" + (i === 0 ? " -open" : "")}
+          open={i === 0}
+        >
+          <summary class="c_pull_ttl accordion_item_ttl">
+            <span class="accordion_item_ttl_text">{item.ttl}</span>
+          </summary>
+          <div class="c_pull_content accordion_item_content">
+            <div class="accordion_item_content_text" set:html={item.content} />
+          </div>
+        </details>
       ))
     }
-  </dl>
+  </div>
 </section>
 `;
 }
@@ -323,7 +328,7 @@ const { concept } = Astro.props;
 `;
 }
 
-function generateVideosSection(
+function generateModalSection(
   content: Record<string, any>,
   components: string[]
 ): string {
@@ -333,43 +338,96 @@ function generateVideosSection(
 ${hasPicture ? 'import Picture from "@/components/Picture.astro";' : ""}
 
 /**
- * 動画セクションコンポーネント
+ * モーダルセクションコンポーネント（開発環境準拠）
+ * 用途: 動画ギャラリー、画像ギャラリー、カスタムダイアログ
+ *
+ * @remarks
+ * Modal.ts が自動判定:
+ * - YouTube URL → iframe モーダル
+ * - 画像パス → 画像モーダル
+ * - aria-controls → カスタムダイアログ
  */
 interface Props {
-  videos: {
+  modal: {
     ttl: string;
     items: {
       ttl: string;
-      desc: string;
-      thumbnail: string;
-      videoUrl: string;
+      desc?: string;
+      thumbnail?: string;
+      src: string;
+      alt?: string;
+      type?: 'video' | 'image' | 'dialog';
+      dialogId?: string;
+    }[];
+    /**
+     * カスタムダイアログ要素（type='dialog' の場合）
+     */
+    dialogs?: {
+      id: string;
+      content: string;
     }[];
   };
-  imgPath: string;
+  imgPath?: string;
 }
 
-const { videos, imgPath } = Astro.props;
+const { modal, imgPath = '' } = Astro.props;
 ---
 
-<section class="videos_section">
-  <h2 class="section_ttl" set:html={videos.ttl} />
-  <ul class="video_list">
+<section class="modal_section">
+  <h2 class="section_ttl">{modal.ttl}</h2>
+  <ul class="modal_list">
     {
-      videos.items.map((video) => (
-        <li class="video_item">
-          <a href={video.videoUrl} target="_blank" rel="noopener noreferrer">
-            <div class="video_item_thumbnail">
-              ${hasPicture ? '<Picture src={imgPath + video.thumbnail} alt={video.ttl} sizes={[800, 450]} />' : '<img src={imgPath + video.thumbnail} alt={video.ttl} loading="lazy" />'}
-            </div>
-            <div class="video_item_body">
-              <h3 class="video_item_ttl">{video.ttl}</h3>
-              <p class="video_item_desc">{video.desc}</p>
-            </div>
-          </a>
+      modal.items.map((item) => (
+        <li class="modal_item">
+          <button
+            type="button"
+            class="c_modal_btn modal_card"
+            data-src={item.type !== 'dialog' ? item.src : undefined}
+            data-alt={item.alt}
+            aria-controls={item.type === 'dialog' ? item.dialogId : undefined}
+          >
+            {item.thumbnail && (
+              <span class="modal_thumbnail">
+                ${hasPicture ? '<Picture src={imgPath + item.thumbnail} alt={item.alt || item.ttl} sizes={[800, 450]} />' : '<img src={imgPath + item.thumbnail} alt={item.alt || item.ttl} loading="lazy" />'}
+                {item.type === 'video' && (
+                  <span class="modal_play_icon">
+                    <svg
+                      width="60"
+                      height="60"
+                      viewBox="0 0 60 60"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle cx="30" cy="30" r="30" fill="white" opacity="0.9" />
+                      <path d="M24 18L42 30L24 42V18Z" fill="#667eea" />
+                    </svg>
+                  </span>
+                )}
+              </span>
+            )}
+            <span class="modal_body">
+              <h3 class="modal_ttl">{item.ttl}</h3>
+              {item.desc && <p class="modal_desc">{item.desc}</p>}
+            </span>
+          </button>
         </li>
       ))
     }
   </ul>
+
+  {
+    modal.dialogs &&
+      modal.dialogs.map((dialog) => (
+        <dialog id={dialog.id} class="c_modal">
+          <div class="c_modal_content" tabindex="-1">
+            <div set:html={dialog.content} />
+            <button class="c_modal_close">
+              <span class="txtHidden">モーダルウィンドウを閉じる</span>
+            </button>
+          </div>
+        </dialog>
+      ))
+  }
 </section>
 `;
 }

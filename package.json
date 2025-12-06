@@ -1,0 +1,36 @@
+{
+  "name": "astro-generator-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for generating Astro components, sections, and pages from design data and content",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "inspector": "npx @modelcontextprotocol/inspector dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "astro",
+    "generator",
+    "code-generation",
+    "design-to-code"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.8",
+    "xlsx": "^0.18.5",
+    "gray-matter": "^4.0.3",
+    "prettier": "^3.5.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

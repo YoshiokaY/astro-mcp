@@ -9,14 +9,15 @@ interface ScssConfig {
 
 /**
  * SCSSコード生成
+ * 開発環境のmixin・変数を活用
  */
 export async function generateScss(config: ScssConfig): Promise<string> {
   const { name, design = {} } = config;
   const className = `.c_${toSnakeCase(name)}`;
 
   const {
-    colors = { primary: "#0ea5e9", background: "#fff" },
-    typography = { size: "1.6rem", lineHeight: "1.6" },
+    colors = { primary: "$color-prime", background: "$color-body" },
+    typography = { size: "$text-lg", lineHeight: "1.6" },
     layout = "flex",
   } = design;
 
@@ -25,16 +26,16 @@ export async function generateScss(config: ScssConfig): Promise<string> {
   ${layout === "flex" ? "flex-direction: column;" : ""}
   ${layout === "grid" ? "grid-template-columns: 1fr;\n  gap: 1.6rem;" : ""}
   padding: 2rem;
-  background: ${colors.background || "#fff"};
-  border-radius: 0.8rem;
-  transition: transform 0.3s ease;
+  background: ${colors.background || "$color-body"};
+  border-radius: 0.4rem;
+  transition: transform $easing;
 
   @include mq() {
     padding: 2.4rem;
     ${layout === "grid" ? "grid-template-columns: repeat(2, 1fr);" : ""}
   }
 
-  &:hover {
+  @include hover {
     transform: translateY(-0.4rem);
   }
 
@@ -47,6 +48,13 @@ export async function generateScss(config: ScssConfig): Promise<string> {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform $easing;
+    }
+
+    @include hover {
+      img {
+        transform: scale(1.05);
+      }
     }
   }
 
@@ -57,16 +65,16 @@ export async function generateScss(config: ScssConfig): Promise<string> {
   }
 
   &_ttl {
-    font-size: ${typography.size || "1.8rem"};
+    font-size: ${typography.size || "$text-lg"};
     font-weight: 700;
     line-height: ${typography.lineHeight || "1.6"};
-    color: ${colors.primary || "#333"};
+    color: ${colors.primary || "$color-prime"};
   }
 
   &_desc {
-    font-size: 1.4rem;
+    font-size: $text-sm;
     line-height: 1.7;
-    color: #666;
+    color: $color-txt;
   }
 }
 `;

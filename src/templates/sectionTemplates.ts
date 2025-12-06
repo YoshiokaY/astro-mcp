@@ -107,16 +107,16 @@ const { articles, imgPath } = Astro.props;
         <li class="article_item">
           <a href={article.href}>
             <article class="article_card">
-              <div class="card_img">
+              <div class="article_card_img">
                 ${hasPicture ? '<Picture src={imgPath + article.img} alt={article.imgAlt} sizes={[800, 450]} lazy={false} />' : '<img src={imgPath + article.img} alt={article.imgAlt} loading="lazy" />'}
               </div>
-              <div class="card_body">
-                <div class="card_header">
-                  <span class="card_category" set:html={article.category} />
-                  ${hasSetTime ? "<SetTime time={article.date} />" : '<time class="card_date">{article.date}</time>'}
+              <div class="article_card_body">
+                <div class="article_card_header">
+                  <span class="article_card_category" set:html={article.category} />
+                  ${hasSetTime ? "<SetTime time={article.date} />" : '<time class="article_card_date">{article.date}</time>'}
                 </div>
-                <h3 class="card_ttl" set:html={article.ttl} />
-                <p class="card_desc" set:html={article.desc} />
+                <h3 class="article_card_ttl" set:html={article.ttl} />
+                <p class="article_card_desc" set:html={article.desc} />
               </div>
             </article>
           </a>
@@ -340,12 +340,12 @@ const { videos, imgPath } = Astro.props;
       videos.items.map((video) => (
         <li class="video_item">
           <a href={video.videoUrl} target="_blank" rel="noopener noreferrer">
-            <div class="video_thumbnail">
+            <div class="video_item_thumbnail">
               ${hasPicture ? '<Picture src={imgPath + video.thumbnail} alt={video.ttl} sizes={[800, 450]} />' : '<img src={imgPath + video.thumbnail} alt={video.ttl} loading="lazy" />'}
             </div>
-            <div class="video_body">
-              <h3 class="video_ttl">{video.ttl}</h3>
-              <p class="video_desc">{video.desc}</p>
+            <div class="video_item_body">
+              <h3 class="video_item_ttl">{video.ttl}</h3>
+              <p class="video_item_desc">{video.desc}</p>
             </div>
           </a>
         </li>

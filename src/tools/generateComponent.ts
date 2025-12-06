@@ -46,7 +46,7 @@ export async function generateComponent(args: any) {
       content: [
         {
           type: "text",
-          text: `✅ コンポーネント「${componentName}」を生成しました\n\n## Astroコンポーネント\n\`\`\`astro\n${formattedAstro}\n\`\`\`\n\n## SCSS\n\`\`\`scss\n${formattedScss}\n\`\`\`\n\n### 配置先\n- \`src/components/${componentName}.astro\`\n- \`src/scss/components/_c_${toKebabCase(componentName)}.scss\``,
+          text: `✅ コンポーネント「${componentName}」を生成しました\n\n## Astroコンポーネント\n\`\`\`astro\n${formattedAstro}\n\`\`\`\n\n## SCSS\n\`\`\`scss\n${formattedScss}\n\`\`\`\n\n### 配置先\n- \`src/components/${componentName}.astro\`\n- \`src/scss/components/_c_${toSnakeCase(componentName)}.scss\``,
         },
       ],
     };
@@ -55,6 +55,6 @@ export async function generateComponent(args: any) {
   }
 }
 
-function toKebabCase(str: string): string {
-  return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+function toSnakeCase(str: string): string {
+  return str.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
 }

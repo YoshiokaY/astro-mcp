@@ -12,7 +12,7 @@ interface ScssConfig {
  */
 export async function generateScss(config: ScssConfig): Promise<string> {
   const { name, design = {} } = config;
-  const className = `.c_${toKebabCase(name)}`;
+  const className = `.c_${toSnakeCase(name)}`;
 
   const {
     colors = { primary: "#0ea5e9", background: "#fff" },
@@ -38,7 +38,7 @@ export async function generateScss(config: ScssConfig): Promise<string> {
     transform: translateY(-0.4rem);
   }
 
-  &-img {
+  &_img {
     aspect-ratio: 16 / 9;
     overflow: hidden;
     border-radius: 0.4rem;
@@ -50,20 +50,20 @@ export async function generateScss(config: ScssConfig): Promise<string> {
     }
   }
 
-  &-body {
+  &_body {
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
   }
 
-  &-ttl {
+  &_ttl {
     font-size: ${typography.size || "1.8rem"};
     font-weight: 700;
     line-height: ${typography.lineHeight || "1.6"};
     color: ${colors.primary || "#333"};
   }
 
-  &-desc {
+  &_desc {
     font-size: 1.4rem;
     line-height: 1.7;
     color: #666;
@@ -72,6 +72,6 @@ export async function generateScss(config: ScssConfig): Promise<string> {
 `;
 }
 
-function toKebabCase(str: string): string {
-  return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+function toSnakeCase(str: string): string {
+  return str.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
 }

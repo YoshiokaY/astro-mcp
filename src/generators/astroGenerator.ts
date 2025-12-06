@@ -10,16 +10,13 @@ interface AstroComponentConfig {
 export async function generateAstroComponent(
   config: AstroComponentConfig
 ): Promise<string> {
-  const { name, props, accessibility } = config;
+  const { name, props, accessibility = true } = config;
 
   // Props定義からTypeScript interfaceを生成
   const propsInterface = generatePropsInterface(props);
 
   // Props destructuringを生成
   const propsDestructuring = Object.keys(props).join(", ");
-
-  // アクセシビリティ対応のARIA属性
-  const ariaAttrs = accessibility ? generateAriaAttributes(props) : "";
 
   // コンポーネント本体を生成
   const componentBody = generateComponentBody(name, props, accessibility);
@@ -88,7 +85,7 @@ function generateComponentBody(
   props: Record<string, any>,
   accessibility: boolean
 ): string {
-  const className = `c_${toKebabCase(name)}`;
+  const className = `c_${toSnakeCase(name)}`;
 
   // シンプルなカード型コンポーネントのテンプレート
   const propKeys = Object.keys(props);
@@ -98,30 +95,34 @@ function generateComponentBody(
     (key) => key.includes("desc") || key === "description"
   );
 
-  let body = `<div class="${className}">`;
+  // アクセシビリティ対応のaria属性
+  const ariaAttrs = accessibility ? generateAriaAttributes(props) : "";
+
+  let body = `<div class="${className}"${ariaAttrs}>`;
 
   if (hasImage) {
     const imgProp = propKeys.find((key) => key.includes("img") || key === "src");
     const altProp = propKeys.find((key) => key.includes("alt")) || "alt";
-    body += `\n  <div class="${className}-img">
-    <img src={${imgProp}} alt={${altProp}} loading="lazy" />
+    const altRequired = accessibility ? ` alt={${altProp}}` : "";
+    body += `\n  <div class="${className}_img">
+    <img src={${imgProp}}${altRequired} loading="lazy" />
   </div>`;
   }
 
-  body += `\n  <div class="${className}-body">`;
+  body += `\n  <div class="${className}_body">`;
 
   if (hasTitle) {
     const titleProp = propKeys.find(
       (key) => key.includes("ttl") || key === "title"
     );
-    body += `\n    <h3 class="${className}-ttl">{${titleProp}}</h3>`;
+    body += `\n    <h3 class="${className}_ttl">{${titleProp}}</h3>`;
   }
 
   if (hasDesc) {
     const descProp = propKeys.find(
       (key) => key.includes("desc") || key === "description"
     );
-    body += `\n    <p class="${className}-desc">{${descProp}}</p>`;
+    body += `\n    <p class="${className}_desc">{${descProp}}</p>`;
   }
 
   // その他のpropsを表示
@@ -134,7 +135,7 @@ function generateComponentBody(
       !key.includes("title") &&
       !key.includes("description")
     ) {
-      body += `\n    <div class="${className}-${toKebabCase(key)}">{${key}}</div>`;
+      body += `\n    <div class="${className}_${toSnakeCase(key)}">{${key}}</div>`;
     }
   }
 
@@ -144,6 +145,6 @@ function generateComponentBody(
   return body;
 }
 
-function toKebabCase(str: string): string {
-  return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+function toSnakeCase(str: string): string {
+  return str.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
 }

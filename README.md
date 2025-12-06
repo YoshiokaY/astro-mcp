@@ -15,24 +15,67 @@
 
 ## インストール
 
+### 方法1: npxで直接実行（推奨）
+
 ```bash
-cd /Users/yoshioka.y/project/astro-generator-mcp
+npx astro-mcp
+```
+
+### 方法2: グローバルインストール
+
+```bash
+npm install -g astro-mcp
+```
+
+### 方法3: ローカル開発
+
+```bash
+git clone https://github.com/YOUR_USERNAME/astro-mcp.git
+cd astro-mcp
 npm install
 npm run build
+npm link
 ```
 
 ## Claude Desktop設定
 
 `~/Library/Application Support/Claude/claude_desktop_config.json` に以下を追加:
 
+### npx使用の場合
+
 ```json
 {
-  "mcpServers": {
-    "astro-generator": {
-      "command": "node",
-      "args": ["/Users/yoshioka.y/project/astro-generator-mcp/dist/index.js"]
-    }
-  }
+	"mcpServers": {
+		"astro-generator": {
+			"command": "npx",
+			"args": ["astro-mcp"]
+		}
+	}
+}
+```
+
+### グローバルインストールの場合
+
+```json
+{
+	"mcpServers": {
+		"astro-generator": {
+			"command": "astro-mcp"
+		}
+	}
+}
+```
+
+### ローカル開発の場合
+
+```json
+{
+	"mcpServers": {
+		"astro-generator": {
+			"command": "node",
+			"args": ["/absolute/path/to/astro-mcp/dist/index.js"]
+		}
+	}
 }
 ```
 
@@ -41,6 +84,7 @@ npm run build
 ### 1. コンポーネント生成
 
 **プロンプト例**:
+
 ```
 ArticleCardコンポーネントを生成してください。
 
@@ -59,38 +103,41 @@ Props:
 ```
 
 **実行されるMCPツール**:
+
 ```json
 {
-  "name": "generate-component",
-  "arguments": {
-    "componentName": "ArticleCard",
-    "props": {
-      "ttl": { "type": "string", "description": "タイトル" },
-      "desc": { "type": "string", "description": "説明文" },
-      "date": { "type": "string", "description": "投稿日" },
-      "category": { "type": "string", "description": "カテゴリ" },
-      "img": { "type": "string", "description": "画像パス" },
-      "imgAlt": { "type": "string", "description": "画像の代替テキスト" }
-    },
-    "design": {
-      "colors": { "primary": "#0ea5e9" },
-      "layout": "grid",
-      "typography": { "size": "1.6rem" }
-    },
-    "accessibility": true
-  }
+	"name": "generate-component",
+	"arguments": {
+		"componentName": "ArticleCard",
+		"props": {
+			"ttl": { "type": "string", "description": "タイトル" },
+			"desc": { "type": "string", "description": "説明文" },
+			"date": { "type": "string", "description": "投稿日" },
+			"category": { "type": "string", "description": "カテゴリ" },
+			"img": { "type": "string", "description": "画像パス" },
+			"imgAlt": { "type": "string", "description": "画像の代替テキスト" }
+		},
+		"design": {
+			"colors": { "primary": "#0ea5e9" },
+			"layout": "grid",
+			"typography": { "size": "1.6rem" }
+		},
+		"accessibility": true
+	}
 }
 ```
 
 **出力**:
+
 - `src/components/ArticleCard.astro`
-- `src/scss/components/_c_article-card.scss`
+- `src/scss/components/_c_article_card.scss`
 
 ---
 
 ### 2. セクション生成
 
 **プロンプト例**:
+
 ```
 sampleページ用のarticlesセクションを生成してください。
 
@@ -105,22 +152,24 @@ sampleページ用のarticlesセクションを生成してください。
 ```
 
 **実行されるMCPツール**:
+
 ```json
 {
-  "name": "generate-section",
-  "arguments": {
-    "sectionType": "articles",
-    "pageName": "sample",
-    "content": {
-      "ttl": "最新記事",
-      "items": []
-    },
-    "components": ["Picture", "SetTime"]
-  }
+	"name": "generate-section",
+	"arguments": {
+		"sectionType": "articles",
+		"pageName": "sample",
+		"content": {
+			"ttl": "最新記事",
+			"items": []
+		},
+		"components": ["Picture", "SetTime"]
+	}
 }
 ```
 
 **出力**:
+
 - `src/pages/_parts/_sample/_articles.astro`
 
 ---
@@ -128,6 +177,7 @@ sampleページ用のarticlesセクションを生成してください。
 ### 3. ページ全体生成
 
 **プロンプト例**:
+
 ```
 blogページを生成してください。
 
@@ -148,35 +198,37 @@ blogページを生成してください。
 ```
 
 **実行されるMCPツール**:
+
 ```json
 {
-  "name": "generate-page",
-  "arguments": {
-    "pageName": "blog",
-    "pageData": {
-      "head": {
-        "slug": "blog",
-        "ttl": "技術ブログ",
-        "description": "Web開発に関する最新情報",
-        "url": "/blog/"
-      },
-      "breadcrumbs": [
-        { "text": "ホーム", "link": "/" },
-        { "text": "技術ブログ", "link": "/blog/" }
-      ],
-      "contents": {
-        "hero": { "ttl": "Tech Blog", "subtitle": "最新の技術情報を発信" },
-        "articles": { "ttl": "最新記事", "items": [] },
-        "categories": { "ttl": "カテゴリー", "items": [] },
-        "qa": { "ttl": "よくある質問", "items": [] }
-      }
-    },
-    "sections": ["hero", "articles", "categories", "qa"]
-  }
+	"name": "generate-page",
+	"arguments": {
+		"pageName": "blog",
+		"pageData": {
+			"head": {
+				"slug": "blog",
+				"ttl": "技術ブログ",
+				"description": "Web開発に関する最新情報",
+				"url": "/blog/"
+			},
+			"breadcrumbs": [
+				{ "text": "ホーム", "link": "/" },
+				{ "text": "技術ブログ", "link": "/blog/" }
+			],
+			"contents": {
+				"hero": { "ttl": "Tech Blog", "subtitle": "最新の技術情報を発信" },
+				"articles": { "ttl": "最新記事", "items": [] },
+				"categories": { "ttl": "カテゴリー", "items": [] },
+				"qa": { "ttl": "よくある質問", "items": [] }
+			}
+		},
+		"sections": ["hero", "articles", "categories", "qa"]
+	}
 }
 ```
 
 **出力**:
+
 - `src/pages/blog/index.astro`
 
 ---
@@ -184,6 +236,7 @@ blogページを生成してください。
 ### 4. Excelからスキーマ生成
 
 **プロンプト例**:
+
 ```
 以下のExcelデータからPageData型を生成してください。
 
@@ -194,37 +247,39 @@ blogページを生成してください。
 ```
 
 **実行されるMCPツール**:
+
 ```json
 {
-  "name": "generate-schema",
-  "arguments": {
-    "sourceType": "excel",
-    "sourceData": "/path/to/data.xlsx",
-    "schemaName": "PageData"
-  }
+	"name": "generate-schema",
+	"arguments": {
+		"sourceType": "excel",
+		"sourceData": "/path/to/data.xlsx",
+		"schemaName": "PageData"
+	}
 }
 ```
 
 **出力**:
+
 ```typescript
 export interface PageData {
-  head: {
-    slug: string;
-    ttl: string;
-    description: string;
-    url: string;
-  };
-  contents: {
-    articles: {
-      ttl: string;
-      items: {
-        タイトル: string;
-        説明文: string;
-        投稿日: string;
-        カテゴリ: string;
-      }[];
-    };
-  };
+	head: {
+		slug: string;
+		ttl: string;
+		description: string;
+		url: string;
+	};
+	contents: {
+		articles: {
+			ttl: string;
+			items: {
+				タイトル: string;
+				説明文: string;
+				投稿日: string;
+				カテゴリ: string;
+			}[];
+		};
+	};
 }
 ```
 
@@ -287,7 +342,7 @@ npm run inspector
 ## プロジェクト構造
 
 ```
-astro-generator-mcp/
+astro-mcp/
 ├── src/
 │   ├── index.ts                    # MCPサーバーエントリーポイント
 │   ├── tools/                      # MCPツール実装
@@ -331,6 +386,7 @@ astro-generator-mcp/
 ## ロードマップ
 
 ### Phase 1: プロトタイプ（完了）
+
 - [x] 基本的なMCPサーバー構築
 - [x] コンポーネント生成機能
 - [x] セクション生成機能
@@ -338,12 +394,14 @@ astro-generator-mcp/
 - [x] スキーマ生成機能
 
 ### Phase 2: 拡張機能（次期）
+
 - [ ] Figma API連携（デザイントークン自動抽出）
 - [ ] 画像OCR対応（デザインカンプ解析）
 - [ ] レスポンシブSCSS自動生成
 - [ ] アクセシビリティチェック機能
 
 ### Phase 3: AI強化（将来）
+
 - [ ] 自然言語からの直接生成
 - [ ] デザインシステム学習機能
 - [ ] コンポーネントライブラリ管理

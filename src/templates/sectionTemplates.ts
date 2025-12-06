@@ -135,6 +135,7 @@ function generateCategoriesSection(
   return `---
 /**
  * カテゴリーセクションコンポーネント
+ * タブUIで実装（開発環境準拠）
  */
 interface Props {
   categories: {
@@ -149,23 +150,40 @@ interface Props {
 const { categories } = Astro.props;
 ---
 
-<section class="categories_section">
-  <h2 class="section_ttl" set:html={categories.ttl} />
-  <ul class="category_list">
+<aside class="categories_section c_tab">
+  <h2 class="section_ttl">{categories.ttl}</h2>
+  <ul class="c_tab_list category_tab_list">
     {
-      categories.items.map((category) => (
-        <li class="category_item">
-          <h3 class="category_name">{category.name}</h3>
-          <ul class="category_children">
-            {category.children.map((child) => (
-              <li class="category_child">{child}</li>
-            ))}
-          </ul>
+      categories.items.map((category, i) => (
+        <li>
+          <button
+            type="button"
+            class={i === 0 ? "-open" : ""}
+            aria-pressed={i === 0 ? "true" : "false"}
+            tabindex={i === 0 ? "-1" : "0"}
+          >
+            {category.name}
+          </button>
         </li>
       ))
     }
   </ul>
-</section>
+  {
+    categories.items.map((category, i) => (
+      <div
+        class="c_tab_content category_tab_content"
+        hidden={i !== 0}
+        tabindex="-1"
+      >
+        <ul class="category_child_list">
+          {category.children.map((child) => (
+            <li class="category_child_item">{child}</li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</aside>
 `;
 }
 

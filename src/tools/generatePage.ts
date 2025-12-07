@@ -1,5 +1,6 @@
 import { generatePageTemplate } from "../templates/pageTemplates.js";
 import { formatCode } from "../utils/formatter.js";
+import { parsePageIntent } from "../utils/promptParser.js";
 import {
   type HeadConfig,
   type MenuItem,
@@ -14,6 +15,7 @@ import { resolve } from "path";
 
 interface PageArgs {
   pageName: string;
+  prompt?: string; // プロンプトベースのページタイプ判定用
   pageData: {
     head: {
       slug: string;
@@ -41,6 +43,7 @@ interface PageArgs {
 export async function generatePage(args: any) {
   const {
     pageName,
+    prompt,
     pageData,
     sections,
     siteConfig,
@@ -50,6 +53,19 @@ export async function generatePage(args: any) {
 
   try {
     const updateLogs: string[] = [];
+
+    // ページタイプ自動判定
+    let pageType: 'top' | 'lower' | undefined;
+    if (prompt) {
+      const parsed = parsePageIntent(prompt, pageName);
+      pageType = parsed.pageType;
+
+      if (parsed.confidence < 0.7) {
+        updateLogs.push(
+          `⚠️ ページタイプ判定の信頼度が低い（${parsed.confidence}）: "${prompt}"`
+        );
+      }
+    }
 
     // 1. Common.astro の更新（サイト設定が指定されている場合）
     if (siteConfig) {
@@ -112,6 +128,7 @@ export async function generatePage(args: any) {
     // 3. ページテンプレート生成
     const pageCode = generatePageTemplate({
       pageName,
+      pageType,
       pageData,
       sections,
     });

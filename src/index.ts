@@ -96,10 +96,15 @@ class AstroGeneratorServer {
         {
           name: "generate-section",
           description:
-            "ページセクション（_parts配下）を生成します。セクション種類とコンテンツデータから、再利用可能なセクションコンポーネントを作成します。",
+            "ページセクション（_parts配下）を生成します。プロンプトまたは構造化データから、柔軟なUIパターンで再利用可能なセクションコンポーネントを作成します。",
           inputSchema: {
             type: "object",
             properties: {
+              prompt: {
+                type: "string",
+                description:
+                  "セクション生成の意図を記述（例: 記事一覧をカード形式で表示、Q&Aをアコーディオンで）",
+              },
               sectionType: {
                 type: "string",
                 description:
@@ -113,8 +118,16 @@ class AstroGeneratorServer {
                   "tech",
                   "concept",
                   "videos",
+                  "gallery",
+                  "modal",
                   "custom",
                 ],
+              },
+              uiPattern: {
+                type: "string",
+                description:
+                  "UIパターン（tab/accordion/grid/carousel/list/modal）",
+                enum: ["tab", "accordion", "grid", "carousel", "list", "modal"],
               },
               pageName: {
                 type: "string",
@@ -133,16 +146,20 @@ class AstroGeneratorServer {
                 },
               },
             },
-            required: ["sectionType", "pageName", "content"],
+            required: ["pageName"],
           },
         },
         {
           name: "generate-page",
           description:
-            "完全なAstroページを生成します。ページ構造、メタデータ、各セクションのデータから、index.astroファイルを作成します。オプションでサイト全体の設定（Common.astro、_variables.scss）も更新可能です。",
+            "完全なAstroページを生成します。ページ構造、メタデータ、各セクションのデータから、index.astroファイルを作成します。プロンプトでページタイプ（トップ/下層）を自動判定し、下層ページの場合はBreadcrumbsとLowerTitleコンポーネントを自動追加します。オプションでサイト全体の設定（Common.astro、_variables.scss）も更新可能です。",
           inputSchema: {
             type: "object",
             properties: {
+              prompt: {
+                type: "string",
+                description: "ページ生成の意図を記述（例: 会社概要の下層ページを作成、トップページを作成）",
+              },
               pageName: {
                 type: "string",
                 description: "ページ名（例: about, sample, contact）",

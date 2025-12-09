@@ -1,11 +1,11 @@
 {
-  "name": "astro-mcp",
+  "name": "astro-dev-mcp",
   "version": "0.3.0",
   "description": "MCP server for generating Astro components, sections, and pages from design data and content",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "astro-mcp": "dist/index.js"
+    "astro-dev-mcp": "dist/index.js"
   },
   "files": [
     "dist",
@@ -31,12 +31,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YoshiokaY/astro-mcp.git"
+    "url": "https://github.com/YoshiokaY/astro-dev-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/YoshiokaY/astro-mcp/issues"
+    "url": "https://github.com/YoshiokaY/astro-dev-mcp/issues"
   },
-  "homepage": "https://github.com/YoshiokaY/astro-mcp#readme",
+  "homepage": "https://github.com/YoshiokaY/astro-dev-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
     "zod": "^3.23.8",

@@ -1,6 +1,6 @@
 {
   "name": "astro-dev-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "MCP server for generating Astro components, sections, and pages from design data and content",
   "type": "module",
   "main": "dist/index.js",

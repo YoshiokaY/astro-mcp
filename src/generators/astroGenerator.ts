@@ -148,3 +148,92 @@ function generateComponentBody(
 function toSnakeCase(str: string): string {
   return str.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
 }
+
+/**
+ * グローバルナビゲーションコンポーネント生成（開発環境準拠）
+ */
+export function generateGnaviComponent(): string {
+  return `---
+/**
+ * グローバルナビゲーションコンポーネント
+ * Hamburger.ts と連携してSPメニューの開閉を制御
+ */
+interface MenuItem {
+  link: string;
+  txt: string;
+  blank?: boolean;
+  anchor?: boolean;
+  child?: MenuItem[];
+}
+
+interface Props {
+  /**
+   * グローバルナビゲーションのメニュー項目を定義する配列。
+   */
+  menu: MenuItem[];
+  /**
+   * 現在のページのスラッグ。アンカーリンクの条件分岐に使用されます。
+   */
+  slug: string;
+}
+
+const { menu, slug } = Astro.props;
+---
+
+<nav class="c_nav">
+  <h2 class="txtHidden">グローバルナビゲーション</h2>
+  <button type="button" class="c_nav_btn" aria-expanded="false">
+    <span>メニューを開く</span>
+  </button>
+  <div class="c_nav_wrapper">
+    <ul id="navi">
+      {
+        menu.map((item) => {
+          // 現在のページと一致するか判定
+          const isActive =
+            item.link === "/"
+              ? slug === "top"
+              : item.link.replace(/\\/$/, "").endsWith(\`/\${slug}\`);
+
+          return (
+            <li class={item.child ? "has-child" : undefined}>
+              <a
+                href={item.link}
+                target={item.blank ? "_blank" : "_self"}
+                class={isActive ? "-active" : undefined}
+                set:html={item.txt}
+              />
+              {item.child && (
+                <>
+                  <button type="button" class="spAccordion">
+                    <span class="txtHidden">子メニューを表示します</span>
+                  </button>
+                  <ul class="subMenu">
+                    {item.child.map((child) => (
+                      <li>
+                        <a
+                          href={
+                            child.anchor && child.link.startsWith("#")
+                              ? slug === "sample"
+                                ? child.link
+                                : \`/sample/\${child.link}\`
+                              : child.link
+                          }
+                          target={child.blank ? "_blank" : "_self"}
+                          set:html={child.txt}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </li>
+          );
+        })
+      }
+    </ul>
+    <button type="button" class="c_nav_close txtHidden">メニューを閉じる</button>
+  </div>
+</nav>
+`;
+}

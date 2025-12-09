@@ -1,5 +1,6 @@
 interface PageConfig {
   pageName: string;
+  pageType?: 'top' | 'lower'; // ページタイプ（自動判定または明示指定）
   pageData: {
     head: {
       slug: string;
@@ -17,21 +18,20 @@ interface PageConfig {
  * ページテンプレート生成
  */
 export function generatePageTemplate(config: PageConfig): string {
-  const { pageName, pageData, sections } = config;
+  const { pageName, pageType, pageData, sections } = config;
   const { head, breadcrumbs, contents } = pageData;
 
+  // ページタイプ判定（明示指定がなければbreadcrumbsの有無で判定）
+  const isLowerPage = pageType === 'lower' || !!breadcrumbs;
+
   // インポート文生成
-  const imports = generateImports(pageName, sections, breadcrumbs);
+  const imports = generateImports(pageName, sections, isLowerPage);
 
   // pageオブジェクト生成
   const pageObject = generatePageObject(pageData);
 
   // セクションコンポーネント配置
-  const sectionComponents = generateSectionComponents(
-    pageName,
-    sections,
-    breadcrumbs
-  );
+  const sectionComponents = generateSectionComponents(pageName, sections);
 
   return `---
 ${imports}
@@ -44,7 +44,7 @@ const imgPath = "/_assets/img/" + page.head.slug + "/";
 ---
 
 <Layout page={page.head}>
-${breadcrumbs ? '  <LowerTitle title={page.head.ttl} />\n  <Breadcrumbs bread={page.breadcrumbs} />\n' : ""}
+${isLowerPage ? '  <Breadcrumbs bread={page.breadcrumbs} />\n  <LowerTitle title={page.head.ttl} />\n' : ""}
   <div class="contentInner">
     <div class="p_${pageName}">
 ${sectionComponents}
@@ -57,13 +57,13 @@ ${sectionComponents}
 function generateImports(
   pageName: string,
   sections: string[],
-  breadcrumbs?: any[]
+  isLowerPage: boolean
 ): string {
   const imports = ['import Layout from "@/layouts/Layout.astro";'];
 
-  if (breadcrumbs) {
-    imports.push('import LowerTitle from "@/components/LowerTitle.astro";');
+  if (isLowerPage) {
     imports.push('import Breadcrumbs from "@/components/Breadcrumbs.astro";');
+    imports.push('import LowerTitle from "@/components/LowerTitle.astro";');
   }
 
   // セクションインポート
@@ -83,8 +83,7 @@ function generatePageObject(pageData: any): string {
 
 function generateSectionComponents(
   pageName: string,
-  sections: string[],
-  breadcrumbs?: any[]
+  sections: string[]
 ): string {
   return sections
     .map((section, index) => {

@@ -18,20 +18,20 @@
 ### 方法1: npxで直接実行（推奨）
 
 ```bash
-npx astro-mcp
+npx astro-dev-mcp
 ```
 
 ### 方法2: グローバルインストール
 
 ```bash
-npm install -g astro-mcp
+npm install -g astro-dev-mcp
 ```
 
 ### 方法3: ローカル開発
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/astro-mcp.git
-cd astro-mcp
+git clone https://github.com/YoshiokaY/astro-dev-mcp.git
+cd astro-dev-mcp
 npm install
 npm run build
 npm link
@@ -48,7 +48,7 @@ npm link
 	"mcpServers": {
 		"astro-generator": {
 			"command": "npx",
-			"args": ["astro-mcp"]
+			"args": ["astro-dev-mcp"]
 		}
 	}
 }
@@ -60,7 +60,7 @@ npm link
 {
 	"mcpServers": {
 		"astro-generator": {
-			"command": "astro-mcp"
+			"command": "astro-dev-mcp"
 		}
 	}
 }
@@ -73,7 +73,7 @@ npm link
 	"mcpServers": {
 		"astro-generator": {
 			"command": "node",
-			"args": ["/absolute/path/to/astro-mcp/dist/index.js"]
+			"args": ["/absolute/path/to/astro-dev-mcp/dist/index.js"]
 		}
 	}
 }

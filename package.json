@@ -31,7 +31,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YoshiokaY/astro-dev-mcp.git"
+    "url": "git+https://github.com/YoshiokaY/astro-dev-mcp.git"
   },
   "bugs": {
     "url": "https://github.com/YoshiokaY/astro-dev-mcp/issues"

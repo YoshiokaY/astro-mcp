@@ -45,10 +45,8 @@ const imgPath = "/_assets/img/" + page.head.slug + "/";
 
 <Layout page={page.head}>
 ${isLowerPage ? '  <Breadcrumbs bread={page.breadcrumbs} />\n  <LowerTitle title={page.head.ttl} />\n' : ""}
-  <div class="contentInner">
-    <div class="p_${pageName}">
+  <div class="p_${pageName}">
 ${sectionComponents}
-    </div>
   </div>
 </Layout>
 `;
@@ -92,9 +90,9 @@ function generateSectionComponents(
       const additionalProps =
         section === "articles" || section === "videos" ? " imgPath={imgPath}" : "";
 
-      return `      <section id="${section}">
-        <${componentName} ${props}${additionalProps} />
-      </section>`;
+      return `    <section id="${section}">
+      <${componentName} ${props}${additionalProps} />
+    </section>`;
     })
     .join("\n");
 }

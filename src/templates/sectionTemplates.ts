@@ -102,10 +102,12 @@ const { hero } = Astro.props;
 ---
 
 <section class="hero_section">
-	<div class="hero_content">
-		<h1 class="hero_ttl" set:html={hero.ttl} />
-		{hero.subtitle && <p class="hero_subtitle" set:html={hero.subtitle} />}
-		{hero.desc && <p class="hero_desc" set:html={hero.desc} />}
+	<div class="contentInner">
+		<div class="hero_content">
+			<h1 class="hero_ttl" set:html={hero.ttl} />
+			{hero.subtitle && <p class="hero_subtitle" set:html={hero.subtitle} />}
+			{hero.desc && <p class="hero_desc" set:html={hero.desc} />}
+		</div>
 	</div>
 </section>
 `;
@@ -130,12 +132,14 @@ const { features } = Astro.props;
 ---
 
 <section class="features_section">
-	<h2 class="section_ttl" set:html={features.ttl} />
-	<ul class="feature_list">
-		{features.items.map((item) => (
-			<li class="feature_item" set:html={item} />
-		))}
-	</ul>
+	<div class="contentInner">
+		<h2 class="section_ttl" set:html={features.ttl} />
+		<ul class="feature_list">
+			{features.items.map((item) => (
+				<li class="feature_item" set:html={item} />
+			))}
+		</ul>
+	</div>
 </section>
 `;
 }
@@ -163,18 +167,20 @@ const { tech } = Astro.props;
 ---
 
 <section class="tech_section">
-	<h2 class="section_ttl" set:html={tech.ttl} />
-	{tech.desc && <p class="section_desc" set:html={tech.desc} />}
-	<ul class="tech_list">
-		{
-			tech.items.map((item) => (
-				<li class="tech_item">
-					<h3 class="tech_name">{item.name}</h3>
-					<p class="tech_desc" set:html={item.desc} />
-				</li>
-			))
-		}
-	</ul>
+	<div class="contentInner">
+		<h2 class="section_ttl" set:html={tech.ttl} />
+		{tech.desc && <p class="section_desc" set:html={tech.desc} />}
+		<ul class="tech_list">
+			{
+				tech.items.map((item) => (
+					<li class="tech_item">
+						<h3 class="tech_name">{item.name}</h3>
+						<p class="tech_desc" set:html={item.desc} />
+					</li>
+				))
+			}
+		</ul>
+	</div>
 </section>
 `;
 }
@@ -198,8 +204,10 @@ const { concept } = Astro.props;
 ---
 
 <section class="concept_section">
-	<h2 class="section_ttl" set:html={concept.ttl} />
-	<p class="section_desc" set:html={concept.desc} />
+	<div class="contentInner">
+		<h2 class="section_ttl" set:html={concept.ttl} />
+		<p class="section_desc" set:html={concept.desc} />
+	</div>
 </section>
 `;
 }
@@ -224,8 +232,10 @@ const { ${type} } = Astro.props;
 ---
 
 <section class="${type}_section">
-	<h2 class="section_ttl" set:html={${type}.ttl} />
-	{/* カスタムコンテンツをここに追加 */}
+	<div class="contentInner">
+		<h2 class="section_ttl" set:html={${type}.ttl} />
+		{/* カスタムコンテンツをここに追加 */}
+	</div>
 </section>
 `;
 }

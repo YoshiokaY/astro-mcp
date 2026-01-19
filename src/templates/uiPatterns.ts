@@ -23,9 +23,6 @@ export interface UIPatternConfig {
 		autoplay?: boolean; // カルーセルの自動再生
 		openFirst?: boolean; // アコーディオン初期表示
 		hasImage?: boolean; // 画像表示有無
-		hasPicture?: boolean; // Pictureコンポーネント使用有無
-		useContainer?: boolean; // contentInnerクラス使用（デフォルト: true）
-		useStandardButton?: boolean; // c_btnクラス使用（デフォルト: true）
 	};
 }
 
@@ -54,11 +51,7 @@ export function generateUIPattern(config: UIPatternConfig): string {
 /**
  * タブUI生成(開発環境のTab.ts連携)
  */
-function generateTabUI(config: UIPatternConfig): string {
-	const { options = {} } = config;
-	const { useContainer = true } = options;
-	const containerClass = useContainer ? getContainerClass() : '';
-
+function generateTabUI(_config: UIPatternConfig): string {
 	return `---
 interface Props {
 	data: {
@@ -74,8 +67,8 @@ const { data } = Astro.props;
 ---
 
 <section class="c_tab">
-	${useContainer ? `<div class="${containerClass}">` : ''}
-		<h2 class="section_ttl">{data.ttl}</h2>
+	<div class="contentInner">
+		<h2 class="section_ttl" set:html={data.ttl} />
 		<ul class="c_tab_list">
 			{
 				data.items.map((item, i) => (
@@ -85,9 +78,8 @@ const { data } = Astro.props;
 							class={i === 0 ? "-open" : ""}
 							aria-pressed={i === 0 ? "true" : "false"}
 							tabindex={i === 0 ? "-1" : "0"}
-						>
-							{item.name}
-						</button>
+							set:html={item.name}
+						/>
 					</li>
 				))
 			}
@@ -100,11 +92,11 @@ const { data } = Astro.props;
 					tabindex="-1"
 				>
 					<!-- コンテンツはプロジェクト固有で実装 -->
-					{item.content}
+					<Fragment set:html={item.content} />
 				</div>
 			))
 		}
-	${useContainer ? '</div>' : ''}
+	</div>
 </section>
 `;
 }
@@ -113,9 +105,8 @@ const { data } = Astro.props;
  * アコーディオンUI生成(開発環境のAccordion.ts連携)
  */
 function generateAccordionUI(config: UIPatternConfig): string {
-	const { data, options = {} } = config;
-	const { openFirst = true, useContainer = true } = options;
-	const containerClass = useContainer ? getContainerClass() : '';
+	const { options = {} } = config;
+	const { openFirst = true } = options;
 
 	return `---
 interface Props {
@@ -132,8 +123,8 @@ const { data } = Astro.props;
 ---
 
 <section class="accordion_section">
-	${useContainer ? `<div class="${containerClass}">` : ''}
-		<h2 class="section_ttl">{data.ttl}</h2>
+	<div class="contentInner">
+		<h2 class="section_ttl" set:html={data.ttl} />
 		<div class="accordion_list">
 			{
 				data.items.map((item, i) => (
@@ -142,7 +133,7 @@ const { data } = Astro.props;
 						open={${openFirst} && i === 0}
 					>
 						<summary class="c_pull_ttl accordion_item_ttl">
-							<span class="accordion_item_ttl_text">{item.ttl}</span>
+							<span class="accordion_item_ttl_text" set:html={item.ttl} />
 						</summary>
 						<div class="c_pull_content accordion_item_content">
 							<div class="accordion_item_content_text" set:html={item.content} />
@@ -151,7 +142,7 @@ const { data } = Astro.props;
 				))
 			}
 		</div>
-	${useContainer ? '</div>' : ''}
+	</div>
 </section>
 `;
 }
@@ -160,13 +151,11 @@ const { data } = Astro.props;
  * グリッドUI生成
  */
 function generateGridUI(config: UIPatternConfig): string {
-	const { data, options = {}, components = [] } = config;
-	const { columns = 3, gap = '2.4rem', hasImage = true, useContainer = true } = options;
-	const hasPicture = components.includes('Picture');
-	const containerClass = useContainer ? getContainerClass() : '';
+	const { options = {} } = config;
+	const { columns = 3, gap = '2.4rem', hasImage = true } = options;
 
 	return `---
-${hasPicture ? 'import Picture from "@/components/Picture.astro";' : ''}
+import Picture from "@/components/Picture.astro";
 
 interface Props {
 	data: {
@@ -185,8 +174,8 @@ const { data, imgPath = '' } = Astro.props;
 ---
 
 <section class="grid_section">
-	${useContainer ? `<div class="${containerClass}">` : ''}
-		<h2 class="section_ttl">{data.ttl}</h2>
+	<div class="contentInner">
+		<h2 class="section_ttl" set:html={data.ttl} />
 		<ul class="grid_list" style="display: grid; grid-template-columns: repeat(${columns}, 1fr); gap: ${gap};">
 			{
 				data.items.map((item) => (
@@ -196,21 +185,21 @@ const { data, imgPath = '' } = Astro.props;
 								? `
 						{item.img && (
 							<div class="grid_item_img">
-								${hasPicture ? '<Picture src={imgPath + item.img} alt={item.ttl} sizes={[400, 300]} />' : '<img src={imgPath + item.img} alt={item.ttl} loading="lazy" />'}
+								<Picture src={imgPath + item.img} alt={item.ttl} />
 							</div>
 						)}
 						`
 								: ''
 						}
 						<div class="grid_item_body">
-							<h3 class="grid_item_ttl">{item.ttl}</h3>
-							{item.desc && <p class="grid_item_desc">{item.desc}</p>}
+							<h3 class="grid_item_ttl" set:html={item.ttl} />
+							{item.desc && <p class="grid_item_desc" set:html={item.desc} />}
 						</div>
 					</li>
 				))
 			}
 		</ul>
-	${useContainer ? '</div>' : ''}
+	</div>
 </section>
 `;
 }
@@ -219,13 +208,11 @@ const { data, imgPath = '' } = Astro.props;
  * カルーセルUI生成
  */
 function generateCarouselUI(config: UIPatternConfig): string {
-	const { data, options = {}, components = [] } = config;
-	const { autoplay = false, useContainer = true } = options;
-	const hasPicture = components.includes('Picture');
-	const containerClass = useContainer ? getContainerClass() : '';
+	const { options = {} } = config;
+	const { autoplay = false } = options;
 
 	return `---
-${hasPicture ? 'import Picture from "@/components/Picture.astro";' : ''}
+import Picture from "@/components/Picture.astro";
 
 /**
  * カルーセルセクション
@@ -247,8 +234,8 @@ const { data, imgPath = '' } = Astro.props;
 ---
 
 <section class="carousel_section">
-	${useContainer ? `<div class="${containerClass}">` : ''}
-		<h2 class="section_ttl">{data.ttl}</h2>
+	<div class="contentInner">
+		<h2 class="section_ttl" set:html={data.ttl} />
 		<div class="swiper carousel_swiper" data-autoplay="${autoplay}">
 			<div class="swiper-wrapper">
 				{
@@ -256,12 +243,12 @@ const { data, imgPath = '' } = Astro.props;
 						<div class="swiper-slide carousel_item">
 							{item.img && (
 								<div class="carousel_item_img">
-									${hasPicture ? '<Picture src={imgPath + item.img} alt={item.ttl} sizes={[800, 600]} />' : '<img src={imgPath + item.img} alt={item.ttl} loading="lazy" />'}
+									<Picture src={imgPath + item.img} alt={item.ttl} />
 								</div>
 							)}
 							<div class="carousel_item_body">
-								<h3 class="carousel_item_ttl">{item.ttl}</h3>
-								{item.desc && <p class="carousel_item_desc">{item.desc}</p>}
+								<h3 class="carousel_item_ttl" set:html={item.ttl} />
+								{item.desc && <p class="carousel_item_desc" set:html={item.desc} />}
 							</div>
 						</div>
 					))
@@ -271,7 +258,7 @@ const { data, imgPath = '' } = Astro.props;
 			<div class="swiper-button-prev"></div>
 			<div class="swiper-button-next"></div>
 		</div>
-	${useContainer ? '</div>' : ''}
+	</div>
 </section>
 `;
 }
@@ -279,11 +266,7 @@ const { data, imgPath = '' } = Astro.props;
 /**
  * リストUI生成
  */
-function generateListUI(config: UIPatternConfig): string {
-	const { data, options = {} } = config;
-	const { useContainer = true } = options;
-	const containerClass = useContainer ? getContainerClass() : '';
-
+function generateListUI(_config: UIPatternConfig): string {
 	return `---
 interface Props {
 	data: {
@@ -299,19 +282,19 @@ const { data } = Astro.props;
 ---
 
 <section class="list_section">
-	${useContainer ? `<div class="${containerClass}">` : ''}
-		<h2 class="section_ttl">{data.ttl}</h2>
+	<div class="contentInner">
+		<h2 class="section_ttl" set:html={data.ttl} />
 		<ul class="list">
 			{
 				data.items.map((item) => (
 					<li class="list_item">
-						<h3 class="list_item_ttl">{item.ttl}</h3>
-						{item.desc && <p class="list_item_desc">{item.desc}</p>}
+						<h3 class="list_item_ttl" set:html={item.ttl} />
+						{item.desc && <p class="list_item_desc" set:html={item.desc} />}
 					</li>
 				))
 			}
 		</ul>
-	${useContainer ? '</div>' : ''}
+	</div>
 </section>
 `;
 }
@@ -319,15 +302,9 @@ const { data } = Astro.props;
 /**
  * モーダルUI生成(開発環境のModal.ts連携)
  */
-function generateModalUI(config: UIPatternConfig): string {
-	const { data, components = [], options = {} } = config;
-	const hasPicture = components.includes('Picture');
-	const { useContainer = true, useStandardButton = true } = options;
-	const containerClass = useContainer ? getContainerClass() : '';
-	const buttonClass = useStandardButton ? getButtonClass('c_modal_btn modal_card') : 'c_modal_btn modal_card';
-
+function generateModalUI(_config: UIPatternConfig): string {
 	return `---
-${hasPicture ? 'import Picture from "@/components/Picture.astro";' : ''}
+import Picture from "@/components/Picture.astro";
 
 /**
  * モーダルギャラリーセクション
@@ -352,21 +329,21 @@ const { data, imgPath = '' } = Astro.props;
 ---
 
 <section class="modal_section">
-	${useContainer ? `<div class="${containerClass}">` : ''}
-		<h2 class="section_ttl">{data.ttl}</h2>
+	<div class="contentInner">
+		<h2 class="section_ttl" set:html={data.ttl} />
 		<ul class="modal_list">
 			{
 				data.items.map((item) => (
 					<li class="modal_item">
 						<button
 							type="button"
-							class="${buttonClass}"
+							class="c_modal_btn modal_card"
 							data-src={item.src}
 							data-alt={item.alt}
 						>
 							{item.thumbnail && (
 								<span class="modal_thumbnail">
-									${hasPicture ? '<Picture src={imgPath + item.thumbnail} alt={item.alt || item.ttl} sizes={[800, 450]} />' : '<img src={imgPath + item.thumbnail} alt={item.alt || item.ttl} loading="lazy" />'}
+									<Picture src={imgPath + item.thumbnail} alt={item.alt || item.ttl} />
 									{item.type === 'video' && (
 										<span class="modal_play_icon">
 											<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -378,15 +355,15 @@ const { data, imgPath = '' } = Astro.props;
 								</span>
 							)}
 							<span class="modal_body">
-								<h3 class="modal_ttl">{item.ttl}</h3>
-								{item.desc && <p class="modal_desc">{item.desc}</p>}
+								<h3 class="modal_ttl" set:html={item.ttl} />
+								{item.desc && <p class="modal_desc" set:html={item.desc} />}
 							</span>
 						</button>
 					</li>
 				))
 			}
 		</ul>
-	${useContainer ? '</div>' : ''}
+	</div>
 </section>
 `;
 }

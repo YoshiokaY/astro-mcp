@@ -175,6 +175,14 @@ class AstroGeneratorServer {
                   breadcrumbs: {
                     type: "array",
                     description: "パンくずリスト",
+                    items: {
+                      type: "object",
+                      properties: {
+                        label: { type: "string" },
+                        url: { type: "string" },
+                      },
+                      additionalProperties: true,
+                    },
                   },
                   contents: {
                     type: "object",

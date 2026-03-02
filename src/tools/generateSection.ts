@@ -8,8 +8,8 @@ import {
 	updateAppJs,
 	needsAppJsUpdate,
 } from '../editors/appJsEditor.js';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { resolve, dirname } from 'path';
 
 interface SectionArgs {
 	// プロンプトベース
@@ -126,10 +126,38 @@ export async function generateSection(args: any) {
 				sectionName: finalSectionType,
 				options: scssOptions,
 			});
+		}
 
-			updateLogs.push(
-				`✅ SCSSファイルを生成しました（配置先: src/scss/pages/_${pageName}.scss）`
-			);
+		// 4. ファイルパス解決
+		const astroPath = resolve(
+			projectRoot,
+			`src/pages/_parts/_${pageName}/_${finalSectionType}.astro`
+		);
+		const scssPath = resolve(projectRoot, `src/scss/pages/_${pageName}.scss`);
+
+		// 5. ファイル書き込み
+		try {
+			// Astroセクションファイル
+			mkdirSync(dirname(astroPath), { recursive: true });
+			writeFileSync(astroPath, formattedAstro, 'utf-8');
+			updateLogs.push(`✅ Astroファイル出力: ${astroPath}`);
+
+			// SCSSファイル（新規作成または追記）
+			if (scssCode) {
+				mkdirSync(dirname(scssPath), { recursive: true });
+				if (existsSync(scssPath)) {
+					// 既存ファイルに追記
+					const existingContent = readFileSync(scssPath, 'utf-8');
+					writeFileSync(scssPath, existingContent + '\n\n' + scssCode, 'utf-8');
+					updateLogs.push(`✅ SCSSファイル追記: ${scssPath}`);
+				} else {
+					// 新規作成
+					writeFileSync(scssPath, scssCode, 'utf-8');
+					updateLogs.push(`✅ SCSSファイル出力: ${scssPath}`);
+				}
+			}
+		} catch (writeError) {
+			updateLogs.push(`❌ ファイル書き込みエラー: ${writeError}`);
 		}
 
 		// 結果メッセージの構築
@@ -138,10 +166,10 @@ export async function generateSection(args: any) {
 				? `### プロジェクト更新\n${updateLogs.join('\n')}\n\n`
 				: '';
 
-		let resultText = `${updateSection}### セクション生成\n✅ セクション「${finalSectionType}」（UI: ${finalUIPattern || 'デフォルト'}）を生成しました\n\n#### Astroコンポーネント\n\`\`\`astro\n${formattedAstro}\n\`\`\`\n\n**配置先**: \`src/pages/_parts/_${pageName}/_${finalSectionType}.astro\``;
+		let resultText = `${updateSection}### セクション生成\n✅ セクション「${finalSectionType}」（UI: ${finalUIPattern || 'デフォルト'}）を生成しました\n\n#### Astroコンポーネント\n\`\`\`astro\n${formattedAstro}\n\`\`\``;
 
 		if (scssCode) {
-			resultText += `\n\n#### SCSSファイル\n\`\`\`scss\n${scssCode}\n\`\`\`\n\n**配置先**: \`src/scss/pages/_${pageName}.scss\`\n\n**注意**: 既存の \`_${pageName}.scss\` がある場合は、生成されたSCSSを追記してください。`;
+			resultText += `\n\n#### SCSSファイル\n\`\`\`scss\n${scssCode}\n\`\`\``;
 		}
 
 		return {

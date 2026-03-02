@@ -1,6 +1,8 @@
 import { generateAstroComponent } from "../generators/astroGenerator.js";
 import { generateScss } from "../generators/scssGenerator.js";
 import { formatCode } from "../utils/formatter.js";
+import { writeFileSync, mkdirSync } from "fs";
+import { resolve, dirname } from "path";
 
 interface ComponentArgs {
   componentName: string;
@@ -11,6 +13,7 @@ interface ComponentArgs {
     layout?: "grid" | "flex" | "block";
   };
   accessibility?: boolean;
+  projectRoot?: string;
 }
 
 /**
@@ -22,9 +25,12 @@ export async function generateComponent(args: any) {
     props,
     design = {},
     accessibility = true,
+    projectRoot = process.cwd(),
   } = args as ComponentArgs;
 
   try {
+    const writeLogs: string[] = [];
+
     // 1. Astroコンポーネント生成
     const astroCode = await generateAstroComponent({
       name: componentName,
@@ -42,11 +48,36 @@ export async function generateComponent(args: any) {
     const formattedAstro = await formatCode(astroCode, "astro");
     const formattedScss = await formatCode(scssCode, "scss");
 
+    // 4. ファイルパス解決
+    const astroPath = resolve(
+      projectRoot,
+      `src/components/${componentName}.astro`
+    );
+    const scssPath = resolve(
+      projectRoot,
+      `src/scss/components/_c_${toSnakeCase(componentName)}.scss`
+    );
+
+    // 5. ディレクトリ作成 & ファイル書き込み
+    try {
+      // Astroコンポーネント
+      mkdirSync(dirname(astroPath), { recursive: true });
+      writeFileSync(astroPath, formattedAstro, "utf-8");
+      writeLogs.push(`✅ ${astroPath}`);
+
+      // SCSSファイル
+      mkdirSync(dirname(scssPath), { recursive: true });
+      writeFileSync(scssPath, formattedScss, "utf-8");
+      writeLogs.push(`✅ ${scssPath}`);
+    } catch (writeError) {
+      writeLogs.push(`❌ ファイル書き込みエラー: ${writeError}`);
+    }
+
     return {
       content: [
         {
           type: "text",
-          text: `✅ コンポーネント「${componentName}」を生成しました\n\n## Astroコンポーネント\n\`\`\`astro\n${formattedAstro}\n\`\`\`\n\n## SCSS\n\`\`\`scss\n${formattedScss}\n\`\`\`\n\n### 配置先\n- \`src/components/${componentName}.astro\`\n- \`src/scss/components/_c_${toSnakeCase(componentName)}.scss\``,
+          text: `✅ コンポーネント「${componentName}」を生成しました\n\n### ファイル出力\n${writeLogs.join("\n")}\n\n## Astroコンポーネント\n\`\`\`astro\n${formattedAstro}\n\`\`\`\n\n## SCSS\n\`\`\`scss\n${formattedScss}\n\`\`\``,
         },
       ],
     };

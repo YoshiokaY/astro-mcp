@@ -10,8 +10,8 @@ import {
   type ScssVariablesConfig,
   updateScssVariables,
 } from "../editors/scssVariablesEditor.js";
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { resolve } from "path";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { resolve, dirname } from "path";
 
 interface PageArgs {
   pageName: string;
@@ -136,17 +136,29 @@ export async function generatePage(args: any) {
     // コード整形
     const formatted = await formatCode(pageCode, "astro");
 
+    // 4. ファイルパス解決
+    const pagePath = resolve(projectRoot, `src/pages/${pageName}/index.astro`);
+
+    // 5. ページファイル書き込み
+    try {
+      mkdirSync(dirname(pagePath), { recursive: true });
+      writeFileSync(pagePath, formatted, "utf-8");
+      updateLogs.push(`✅ ページファイル出力: ${pagePath}`);
+    } catch (writeError) {
+      updateLogs.push(`❌ ページファイル書き込みエラー: ${writeError}`);
+    }
+
     // 結果メッセージの構築
     const updateSection =
       updateLogs.length > 0
-        ? `### サイト設定更新\n${updateLogs.join("\n")}\n\n`
+        ? `### プロジェクト更新\n${updateLogs.join("\n")}\n\n`
         : "";
 
     return {
       content: [
         {
           type: "text",
-          text: `${updateSection}### ページ生成\n✅ ページ「${pageName}」を生成しました\n\n\`\`\`astro\n${formatted}\n\`\`\`\n\n### 配置先\n- \`src/pages/${pageName}/index.astro\`\n\n### 必要なセクション\n${sections.map((s) => `- \`src/pages/_parts/_${pageName}/_${s}.astro\``).join("\n")}`,
+          text: `${updateSection}### ページ生成\n✅ ページ「${pageName}」を生成しました\n\n\`\`\`astro\n${formatted}\n\`\`\`\n\n### 必要なセクション\n${sections.map((s) => `- \`src/pages/_parts/_${pageName}/_${s}.astro\``).join("\n")}`,
         },
       ],
     };

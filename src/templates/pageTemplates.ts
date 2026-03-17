@@ -76,7 +76,11 @@ function generateImports(
 }
 
 function generatePageObject(pageData: any): string {
-  return `const page = ${JSON.stringify(pageData, null, 2)};`;
+  const json = JSON.stringify(pageData, null, 2);
+  // キーのクォートを除去してJSオブジェクトリテラル形式に変換
+  // trailing commaはPrettierに任せる
+  const jsLiteral = json.replace(/"([a-zA-Z_$][a-zA-Z0-9_$]*)":/g, "$1:");
+  return `const page = ${jsLiteral};`;
 }
 
 function generateSectionComponents(
@@ -86,7 +90,7 @@ function generateSectionComponents(
   return sections
     .map((section, index) => {
       const componentName = toPascalCase(section) + "Section";
-      const props = `${section}={page.contents.${section}}`;
+      const props = `data={page.contents.${section}}`;
       const additionalProps =
         section === "articles" || section === "videos" ? " imgPath={imgPath}" : "";
 

@@ -44,7 +44,7 @@ export function generateUIPattern(config: UIPatternConfig): string {
 		case 'modal':
 			return generateModalUI(config);
 		default:
-			throw new Error(`Unknown UI pattern: ${config.pattern}`);
+			return generateFallbackBlock(config);
 	}
 }
 
@@ -366,4 +366,86 @@ const { data, imgPath = '' } = Astro.props;
 	</div>
 </section>
 `;
+}
+
+/**
+ * フォールバックブロック生成
+ * サポート外のUIパターンが指定された場合、contentデータからinterfaceを推論し
+ * section > .contentInner の外枠を保証した上で中身はAIに委ねる
+ */
+function generateFallbackBlock(config: UIPatternConfig): string {
+	const { data } = config;
+	const propsInterface = inferInterface(data);
+	const hasImg = Object.keys(data).some(
+		(k) => k.includes('img') || k === 'src',
+	);
+	const importLine = hasImg
+		? 'import Picture from "@/components/Picture.astro";\n\n'
+		: '';
+
+	return `---
+${importLine}/**
+ * カスタムセクション
+ * UIパターン: ${config.pattern}
+ * デザインに合わせてコンテンツ部分を実装してください
+ */
+interface Props {
+	data: {
+${propsInterface}
+	};${hasImg ? '\n\timgPath?: string;' : ''}
+}
+
+const { data${hasImg ? ', imgPath = ""' : ''} } = Astro.props;
+---
+
+<section class="${config.pattern}_section">
+	<div class="contentInner">
+		{/* TODO: デザインに合わせてコンテンツを実装 */}
+		{/* data の構造は上記 Props interface を参照 */}
+	</div>
+</section>
+`;
+}
+
+/**
+ * contentデータからTypeScript interfaceのプロパティ定義を推論
+ */
+function inferInterface(
+	data: Record<string, any>,
+	indent: string = '\t\t',
+): string {
+	return Object.entries(data)
+		.map(([key, value]) => {
+			const type = inferType(value);
+			return `${indent}${key}: ${type};`;
+		})
+		.join('\n');
+}
+
+function inferType(value: any): string {
+	if (value === null || value === undefined) return 'any';
+	if (typeof value === 'string') return 'string';
+	if (typeof value === 'number') return 'number';
+	if (typeof value === 'boolean') return 'boolean';
+
+	if (Array.isArray(value)) {
+		if (value.length === 0) return 'any[]';
+		const first = value[0];
+		if (typeof first === 'object' && first !== null) {
+			const itemProps = Object.entries(first)
+				.map(([k, v]) => `\t\t\t${k}: ${inferType(v)};`)
+				.join('\n');
+			return `{\n${itemProps}\n\t\t}[]`;
+		}
+		return `${inferType(first)}[]`;
+	}
+
+	if (typeof value === 'object') {
+		const objProps = Object.entries(value)
+			.map(([k, v]) => `\t\t\t${k}: ${inferType(v)};`)
+			.join('\n');
+		return `{\n${objProps}\n\t\t}`;
+	}
+
+	return 'any';
 }

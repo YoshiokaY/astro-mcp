@@ -125,7 +125,22 @@ export async function generatePage(args: any) {
       }
     }
 
-    // 3. ページテンプレート生成
+    // 3. セクションファイルの存在チェック
+    const missingSections = sections.filter((section) => {
+      const partPath = resolve(
+        projectRoot,
+        `src/pages/_parts/_${pageName}/_${section}.astro`
+      );
+      return !existsSync(partPath);
+    });
+
+    if (missingSections.length > 0) {
+      updateLogs.push(
+        `⚠️ 以下のセクションファイルが未作成です:\n${missingSections.map((s) => `  - _${s}.astro`).join("\n")}\n  → 先に generate-section で作成することを推奨します`
+      );
+    }
+
+    // 4. ページテンプレート生成
     const pageCode = generatePageTemplate({
       pageName,
       pageType,
@@ -136,10 +151,10 @@ export async function generatePage(args: any) {
     // コード整形
     const formatted = await formatCode(pageCode, "astro");
 
-    // 4. ファイルパス解決
+    // 5. ファイルパス解決
     const pagePath = resolve(projectRoot, `src/pages/${pageName}/index.astro`);
 
-    // 5. ページファイル書き込み
+    // 6. ページファイル書き込み
     try {
       mkdirSync(dirname(pagePath), { recursive: true });
       writeFileSync(pagePath, formatted, "utf-8");

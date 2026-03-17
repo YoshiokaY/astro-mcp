@@ -10,6 +10,7 @@ import {
 } from '../editors/appJsEditor.js';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { resolve, dirname } from 'path';
+import { getGenerationContext } from '../utils/projectContext.js';
 
 interface SectionArgs {
 	// プロンプトベース
@@ -171,6 +172,8 @@ export async function generateSection(args: any) {
 		if (scssCode) {
 			resultText += `\n\n#### SCSSファイル\n\`\`\`scss\n${scssCode}\n\`\`\``;
 		}
+
+		resultText += getGenerationContext(projectRoot);
 
 		return {
 			content: [

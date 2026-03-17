@@ -3,6 +3,7 @@ import { generateScss } from "../generators/scssGenerator.js";
 import { formatCode } from "../utils/formatter.js";
 import { writeFileSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
+import { getGenerationContext } from "../utils/projectContext.js";
 
 interface ComponentArgs {
   componentName: string;
@@ -77,7 +78,7 @@ export async function generateComponent(args: any) {
       content: [
         {
           type: "text",
-          text: `✅ コンポーネント「${componentName}」を生成しました\n\n### ファイル出力\n${writeLogs.join("\n")}\n\n## Astroコンポーネント\n\`\`\`astro\n${formattedAstro}\n\`\`\`\n\n## SCSS\n\`\`\`scss\n${formattedScss}\n\`\`\``,
+          text: `✅ コンポーネント「${componentName}」を生成しました\n\n### ファイル出力\n${writeLogs.join("\n")}\n\n## Astroコンポーネント\n\`\`\`astro\n${formattedAstro}\n\`\`\`\n\n## SCSS\n\`\`\`scss\n${formattedScss}\n\`\`\`${getGenerationContext(projectRoot)}`,
         },
       ],
     };

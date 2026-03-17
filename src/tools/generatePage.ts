@@ -12,6 +12,7 @@ import {
 } from "../editors/scssVariablesEditor.js";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
+import { getGenerationContext } from "../utils/projectContext.js";
 
 interface PageArgs {
   pageName: string;
@@ -173,7 +174,7 @@ export async function generatePage(args: any) {
       content: [
         {
           type: "text",
-          text: `${updateSection}### ページ生成\n✅ ページ「${pageName}」を生成しました\n\n\`\`\`astro\n${formatted}\n\`\`\`\n\n### 必要なセクション\n${sections.map((s) => `- \`src/pages/_parts/_${pageName}/_${s}.astro\``).join("\n")}`,
+          text: `${updateSection}### ページ生成\n✅ ページ「${pageName}」を生成しました\n\n\`\`\`astro\n${formatted}\n\`\`\`\n\n### 必要なセクション\n${sections.map((s) => `- \`src/pages/_parts/_${pageName}/_${s}.astro\``).join("\n")}${getGenerationContext(projectRoot)}`,
         },
       ],
     };

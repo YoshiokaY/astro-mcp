@@ -10,6 +10,8 @@ import { generateComponent } from "./tools/generateComponent.js";
 import { generateSection } from "./tools/generateSection.js";
 import { generatePage } from "./tools/generatePage.js";
 import { generateSchema } from "./tools/generateSchema.js";
+import { getProjectContext } from "./tools/getProjectContext.js";
+import { getComponentInterface } from "./tools/getComponentInterface.js";
 
 /**
  * Astro Generator MCP Server
@@ -345,6 +347,57 @@ class AstroGeneratorServer {
             required: ["sourceType", "sourceData", "schemaName"],
           },
         },
+        {
+          name: "get-project-context",
+          description: `プロジェクトのコーディング規約、ディレクトリ構造の役割、使用可能な技術スタック、およびAIが守るべき制約事項を取得します。タスクを開始する前に必ず一度実行してください。
+
+取得内容:
+- コーディング規約（ai-context.md または .cursorrules から読み込み）
+- プロジェクト構造（src/配下の主要ディレクトリ一覧）
+- SCSS変数の要約（カラー、レイアウト、フォントサイズ）
+
+使用例:
+{
+  "projectRoot": "/path/to/project"
+}`,
+          inputSchema: {
+            type: "object",
+            properties: {
+              projectRoot: {
+                type: "string",
+                description:
+                  "プロジェクトルートパス（デフォルト: カレントディレクトリ）",
+              },
+            },
+            required: [],
+          },
+        },
+        {
+          name: "get-component-interface",
+          description: `コンポーネントのProps型定義を取得します。ファイル全体を読み込まず、interfaceのみを返すためトークン効率が高いです。
+
+componentNameを指定すると単一コンポーネント、省略すると全コンポーネントの一覧を返します。
+
+使用例:
+- 単一: { "componentName": "Picture", "projectRoot": "/path/to/project" }
+- 一覧: { "projectRoot": "/path/to/project" }`,
+          inputSchema: {
+            type: "object",
+            properties: {
+              componentName: {
+                type: "string",
+                description:
+                  "コンポーネント名（例: Picture, Breadcrumbs）。省略で全コンポーネント一覧",
+              },
+              projectRoot: {
+                type: "string",
+                description:
+                  "プロジェクトルートパス（デフォルト: カレントディレクトリ）",
+              },
+            },
+            required: [],
+          },
+        },
       ],
     }));
 
@@ -363,6 +416,12 @@ class AstroGeneratorServer {
 
           case "generate-schema":
             return await generateSchema(request.params.arguments);
+
+          case "get-project-context":
+            return await getProjectContext(request.params.arguments);
+
+          case "get-component-interface":
+            return await getComponentInterface(request.params.arguments);
 
           default:
             throw new Error(`Unknown tool: ${request.params.name}`);

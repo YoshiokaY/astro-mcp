@@ -1,16 +1,40 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 /**
  * Excelファイル解析
  */
 export async function parseExcel(filePath: string): Promise<any> {
   try {
-    const workbook = XLSX.readFile(filePath);
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(filePath);
+    const worksheet = workbook.worksheets[0];
 
-    // シートをJSONに変換
-    const data = XLSX.utils.sheet_to_json(worksheet);
+    if (!worksheet) {
+      throw new Error("シートが見つかりません");
+    }
+
+    // ヘッダー行を取得
+    const headerRow = worksheet.getRow(1);
+    const headers: string[] = [];
+    headerRow.eachCell((cell, colNumber) => {
+      headers[colNumber] = String(cell.value ?? "");
+    });
+
+    // データ行をJSON配列に変換
+    const data: Record<string, any>[] = [];
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return;
+      const rowData: Record<string, any> = {};
+      row.eachCell((cell, colNumber) => {
+        const key = headers[colNumber];
+        if (key) {
+          rowData[key] = cell.value;
+        }
+      });
+      if (Object.keys(rowData).length > 0) {
+        data.push(rowData);
+      }
+    });
 
     // データ構造を推測して整形
     return inferStructureFromExcel(data);

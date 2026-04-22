@@ -2,6 +2,7 @@ import { parseExcel } from "../parsers/excelParser.js";
 import { parseMarkdown } from "../parsers/markdownParser.js";
 import { generateTypeDefinition } from "../generators/typeGenerator.js";
 import { formatCode } from "../utils/formatter.js";
+import { validateName } from "../utils/security.js";
 
 interface SchemaArgs {
   sourceType: "excel" | "markdown" | "json" | "text";
@@ -16,6 +17,9 @@ export async function generateSchema(args: any) {
   const { sourceType, sourceData, schemaName } = args as SchemaArgs;
 
   try {
+    // 入力バリデーション
+    validateName(schemaName, "スキーマ名");
+
     let parsedData: any;
 
     // データソースに応じてパース
@@ -27,7 +31,11 @@ export async function generateSchema(args: any) {
         parsedData = await parseMarkdown(sourceData);
         break;
       case "json":
-        parsedData = JSON.parse(sourceData);
+        try {
+          parsedData = JSON.parse(sourceData);
+        } catch {
+          throw new Error("無効なJSONデータです");
+        }
         break;
       case "text":
         // テキストから構造を推測

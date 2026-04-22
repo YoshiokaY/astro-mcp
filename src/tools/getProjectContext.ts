@@ -1,5 +1,6 @@
 import { readFileSync, existsSync, readdirSync, statSync } from "fs";
 import { resolve, relative } from "path";
+import { assertPathWithinProject, escapeRegExp } from "../utils/security.js";
 
 interface ProjectContextArgs {
   projectRoot?: string;
@@ -102,6 +103,7 @@ export async function getProjectContext(args: any) {
 
   for (const file of contextFiles) {
     const filePath = resolve(projectRoot, file);
+    assertPathWithinProject(filePath, projectRoot);
     if (existsSync(filePath)) {
       try {
         rulesContent = readFileSync(filePath, "utf-8")
@@ -177,7 +179,7 @@ function extractScssVariablesSummary(content: string): string {
   const layoutVars = ["$brakePoint", "$containerSize", "$containerPadding"];
   const layoutMatches = layoutVars
     .map((v) => {
-      const match = content.match(new RegExp(`\\${v}:\\s*[^;]+;`));
+      const match = content.match(new RegExp(`${escapeRegExp(v)}:\\s*[^;]+;`));
       return match ? `- ${match[0].trim()}` : null;
     })
     .filter(Boolean);

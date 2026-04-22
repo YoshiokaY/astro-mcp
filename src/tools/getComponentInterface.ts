@@ -1,5 +1,6 @@
 import { readFileSync, existsSync, readdirSync } from "fs";
 import { resolve, basename } from "path";
+import { validateName, assertPathWithinProject } from "../utils/security.js";
 
 interface ComponentInterfaceArgs {
   componentName?: string;
@@ -35,10 +36,13 @@ export async function getComponentInterface(args: any) {
 
   // 特定コンポーネント指定の場合
   if (componentName) {
-    const fileName = componentName.endsWith(".astro")
-      ? componentName
-      : `${componentName}.astro`;
+    const rawName = componentName.endsWith(".astro")
+      ? componentName.slice(0, -6)
+      : componentName;
+    validateName(rawName, "コンポーネント名");
+    const fileName = `${rawName}.astro`;
     const filePath = resolve(componentsDir, fileName);
+    assertPathWithinProject(filePath, projectRoot);
 
     if (!existsSync(filePath)) {
       return {

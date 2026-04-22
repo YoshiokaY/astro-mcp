@@ -2,6 +2,7 @@
  * _variables.scss 編集機能
  * SCSS変数（カラー、サイズ、ブレークポイント）を解析・更新する
  */
+import { escapeRegExp } from "../utils/security.js";
 
 export interface ColorVariables {
   'color-body'?: string;
@@ -105,7 +106,7 @@ export function updateScssColors(
     if (value !== undefined) {
       // $color-prime: #1d4ed8; のような行を置換
       const varName = key.replace('color-', '');
-      const regex = new RegExp(`\\$color-${varName}:\\s*[^;]+;`, 'g');
+      const regex = new RegExp(`\\$color-${escapeRegExp(varName)}:\\s*[^;]+;`, 'g');
       const replacement = `$color-${varName}: ${value};`;
 
       updatedContent = updatedContent.replace(regex, replacement);
@@ -159,7 +160,7 @@ export function updateScssFontSizes(
 
   for (const [key, value] of Object.entries(fontSizes)) {
     if (value !== undefined) {
-      const regex = new RegExp(`\\$${key}:\\s*\\d+,\\s*\\d+;`, 'g');
+      const regex = new RegExp(`\\$${escapeRegExp(key)}:\\s*\\d+,\\s*\\d+;`, 'g');
       const replacement = `$${key}: ${value.pc}, ${value.sp};`;
 
       updatedContent = updatedContent.replace(regex, replacement);

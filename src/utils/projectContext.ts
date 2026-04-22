@@ -1,5 +1,6 @@
 import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
+import { escapeRegExp } from "./security.js";
 
 /**
  * generate-* ツール実行時にレスポンスへ自動注入するプロジェクト規約を取得
@@ -71,7 +72,7 @@ function readScssVariablesSummary(projectRoot: string): string | null {
     // レイアウト変数
     const layoutVars = ["$brakePoint", "$containerSize", "$containerPadding"];
     for (const v of layoutVars) {
-      const match = content.match(new RegExp(`\\${v}:\\s*[^;]+;`));
+      const match = content.match(new RegExp(`${escapeRegExp(v)}:\\s*[^;]+;`));
       if (match) lines.push(match[0].trim());
     }
 

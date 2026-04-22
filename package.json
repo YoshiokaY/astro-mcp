@@ -1,6 +1,6 @@
 {
   "name": "astro-dev-mcp",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "MCP server for generating Astro components, sections, and pages from design data and content",
   "type": "module",
   "main": "dist/index.js",
@@ -39,10 +39,10 @@
   "homepage": "https://github.com/YoshiokaY/astro-dev-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
-    "zod": "^3.23.8",
-    "xlsx": "^0.18.5",
+    "exceljs": "^4.4.0",
     "gray-matter": "^4.0.3",
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",

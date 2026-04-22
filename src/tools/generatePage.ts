@@ -13,6 +13,7 @@ import {
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
 import { getGenerationContext } from "../utils/projectContext.js";
+import { validateName, assertPathWithinProject } from "../utils/security.js";
 
 interface PageArgs {
   pageName: string;
@@ -53,6 +54,10 @@ export async function generatePage(args: any) {
   } = args as PageArgs;
 
   try {
+    // 入力バリデーション
+    validateName(pageName, "ページ名");
+    sections.forEach((s) => validateName(s, "セクション名"));
+
     const updateLogs: string[] = [];
 
     // ページタイプ自動判定
@@ -152,8 +157,9 @@ export async function generatePage(args: any) {
     // コード整形
     const formatted = await formatCode(pageCode, "astro");
 
-    // 5. ファイルパス解決
+    // 5. ファイルパス解決 & 境界チェック
     const pagePath = resolve(projectRoot, `src/pages/${pageName}/index.astro`);
+    assertPathWithinProject(pagePath, projectRoot);
 
     // 6. ページファイル書き込み
     try {

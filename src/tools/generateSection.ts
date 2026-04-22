@@ -11,6 +11,7 @@ import {
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { getGenerationContext } from '../utils/projectContext.js';
+import { validateName, assertPathWithinProject } from '../utils/security.js';
 
 interface SectionArgs {
 	// プロンプトベース
@@ -57,6 +58,10 @@ export async function generateSection(args: any) {
 	} = args as SectionArgs;
 
 	try {
+		// 入力バリデーション
+		validateName(pageName, 'ページ名');
+		if (sectionType) validateName(sectionType, 'セクション種類');
+
 		const updateLogs: string[] = [];
 		let finalSectionType: string;
 		let finalUIPattern: string | undefined;
@@ -129,12 +134,14 @@ export async function generateSection(args: any) {
 			});
 		}
 
-		// 4. ファイルパス解決
+		// 4. ファイルパス解決 & 境界チェック
 		const astroPath = resolve(
 			projectRoot,
 			`src/pages/_parts/_${pageName}/_${finalSectionType}.astro`
 		);
 		const scssPath = resolve(projectRoot, `src/scss/pages/_${pageName}.scss`);
+		assertPathWithinProject(astroPath, projectRoot);
+		assertPathWithinProject(scssPath, projectRoot);
 
 		// 5. ファイル書き込み
 		try {

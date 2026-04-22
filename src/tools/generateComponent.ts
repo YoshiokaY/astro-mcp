@@ -4,6 +4,7 @@ import { formatCode } from "../utils/formatter.js";
 import { writeFileSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
 import { getGenerationContext } from "../utils/projectContext.js";
+import { validateName, assertPathWithinProject } from "../utils/security.js";
 
 interface ComponentArgs {
   componentName: string;
@@ -30,6 +31,9 @@ export async function generateComponent(args: any) {
   } = args as ComponentArgs;
 
   try {
+    // 入力バリデーション
+    validateName(componentName, "コンポーネント名");
+
     const writeLogs: string[] = [];
 
     // 1. Astroコンポーネント生成
@@ -49,7 +53,7 @@ export async function generateComponent(args: any) {
     const formattedAstro = await formatCode(astroCode, "astro");
     const formattedScss = await formatCode(scssCode, "scss");
 
-    // 4. ファイルパス解決
+    // 4. ファイルパス解決 & 境界チェック
     const astroPath = resolve(
       projectRoot,
       `src/components/${componentName}.astro`
@@ -58,6 +62,8 @@ export async function generateComponent(args: any) {
       projectRoot,
       `src/scss/components/_c_${toSnakeCase(componentName)}.scss`
     );
+    assertPathWithinProject(astroPath, projectRoot);
+    assertPathWithinProject(scssPath, projectRoot);
 
     // 5. ディレクトリ作成 & ファイル書き込み
     try {

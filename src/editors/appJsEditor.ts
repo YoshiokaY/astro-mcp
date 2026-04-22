@@ -4,6 +4,7 @@
  */
 
 import type { UIPattern } from '../templates/uiPatterns.js';
+import { escapeRegExp } from '../utils/security.js';
 
 /**
  * UIパターンから必要なスクリプトクラス名を取得
@@ -140,10 +141,11 @@ export function needsAppJsUpdate(
 
 	// すべてのスクリプトが既に登録されているかチェック
 	return requiredScripts.some((script) => {
+		const escaped = escapeRegExp(script);
 		const importPattern = new RegExp(
-			`import\\s+{\\s*${script}\\s*}\\s+from`
+			`import\\s+{\\s*${escaped}\\s*}\\s+from`
 		);
-		const initPattern = new RegExp(`new\\s+${script}\\(\\)`);
+		const initPattern = new RegExp(`new\\s+${escaped}\\(\\)`);
 		return (
 			!importPattern.test(originalContent) || !initPattern.test(originalContent)
 		);

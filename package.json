@@ -1,6 +1,6 @@
 {
   "name": "astro-dev-mcp",
-  "version": "0.5.5",
+  "version": "0.7.1",
   "description": "MCP server for generating Astro components, sections, and pages from design data and content",
   "type": "module",
   "main": "dist/index.js",
@@ -16,6 +16,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
+    "lint": "eslint .",
+    "test": "node --test",
     "inspector": "npx @modelcontextprotocol/inspector dist/index.js",
     "prepublishOnly": "npm run build"
   },
@@ -39,14 +41,17 @@
   "homepage": "https://github.com/YoshiokaY/astro-dev-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
-    "zod": "^3.23.8",
-    "xlsx": "^0.18.5",
+    "exceljs": "^4.4.0",
     "gray-matter": "^4.0.3",
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.15.3",
-    "typescript": "^5.8.3"
+    "eslint": "^10.13.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.72.1"
   },
   "engines": {
     "node": ">=18.0.0"

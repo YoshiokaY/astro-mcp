@@ -2,6 +2,7 @@
  * Common.astro 編集機能
  * サイト全体の設定（head, menu）を解析・更新する
  */
+import { escapeRegExp } from "../utils/security.js";
 
 export interface HeadConfig {
   siteName?: string;
@@ -45,7 +46,7 @@ export function parseCommonAstro(content: string): {
 
     // 各プロパティを正規表現で抽出
     const extractValue = (key: string): string | undefined => {
-      const match = headContent.match(new RegExp(`${key}:\\s*"([^"]*)"`, 's'));
+      const match = headContent.match(new RegExp(`${escapeRegExp(key)}:\\s*"([^"]*)"`, 's'));
       return match ? match[1] : undefined;
     };
 
@@ -61,7 +62,6 @@ export function parseCommonAstro(content: string): {
   }
 
   // menu セクションの抽出（簡易版、実際のパースは複雑）
-  const menuMatch = content.match(/menu:\s*\[([^\]]+)\]/s);
   const menu: MenuItem[] = [];
 
   // 既存の完全なコンテンツを保持
@@ -85,7 +85,7 @@ export function updateCommonHead(
   for (const [key, value] of Object.entries(updates)) {
     if (value !== undefined) {
       // 既存の行を置換
-      const regex = new RegExp(`(${key}:\\s*)"[^"]*"`, 'g');
+      const regex = new RegExp(`(${escapeRegExp(key)}:\\s*)"[^"]*"`, 'g');
       const replacement = `$1"${value}"`;
 
       if (updatedContent.match(regex)) {

@@ -83,30 +83,30 @@ function extractUIOptions(content: any): any {
 }
 
 function generateHeroSection(
-	content: Record<string, any>,
-	components: string[]
+	_content: Record<string, any>,
+	_components: string[]
 ): string {
 	return `---
 /**
  * ヒーローセクションコンポーネント
  */
 interface Props {
-	hero: {
+	data: {
 		ttl: string;
 		subtitle?: string;
 		desc?: string;
 	};
 }
 
-const { hero } = Astro.props;
+const { data } = Astro.props;
 ---
 
 <section class="hero_section">
 	<div class="contentInner">
 		<div class="hero_content">
-			<h1 class="hero_ttl" set:html={hero.ttl} />
-			{hero.subtitle && <p class="hero_subtitle" set:html={hero.subtitle} />}
-			{hero.desc && <p class="hero_desc" set:html={hero.desc} />}
+			<h1 class="hero_ttl" set:html={data.ttl} />
+			{data.subtitle && <p class="hero_subtitle" set:html={data.subtitle} />}
+			{data.desc && <p class="hero_desc" set:html={data.desc} />}
 		</div>
 	</div>
 </section>
@@ -114,28 +114,28 @@ const { hero } = Astro.props;
 }
 
 function generateFeaturesSection(
-	content: Record<string, any>,
-	components: string[]
+	_content: Record<string, any>,
+	_components: string[]
 ): string {
 	return `---
 /**
  * 特徴セクションコンポーネント
  */
 interface Props {
-	features: {
+	data: {
 		ttl: string;
 		items: string[];
 	};
 }
 
-const { features } = Astro.props;
+const { data } = Astro.props;
 ---
 
 <section class="features_section">
 	<div class="contentInner">
-		<h2 class="section_ttl" set:html={features.ttl} />
+		<h2 class="section_ttl" set:html={data.ttl} />
 		<ul class="feature_list">
-			{features.items.map((item) => (
+			{data.items.map((item) => (
 				<li class="feature_item" set:html={item} />
 			))}
 		</ul>
@@ -145,15 +145,15 @@ const { features } = Astro.props;
 }
 
 function generateTechSection(
-	content: Record<string, any>,
-	components: string[]
+	_content: Record<string, any>,
+	_components: string[]
 ): string {
 	return `---
 /**
  * 技術スタックセクションコンポーネント
  */
 interface Props {
-	tech: {
+	data: {
 		ttl: string;
 		desc?: string;
 		items: {
@@ -163,16 +163,16 @@ interface Props {
 	};
 }
 
-const { tech } = Astro.props;
+const { data } = Astro.props;
 ---
 
 <section class="tech_section">
 	<div class="contentInner">
-		<h2 class="section_ttl" set:html={tech.ttl} />
-		{tech.desc && <p class="section_desc" set:html={tech.desc} />}
+		<h2 class="section_ttl" set:html={data.ttl} />
+		{data.desc && <p class="section_desc" set:html={data.desc} />}
 		<ul class="tech_list">
 			{
-				tech.items.map((item) => (
+				data.items.map((item) => (
 					<li class="tech_item">
 						<h3 class="tech_name">{item.name}</h3>
 						<p class="tech_desc" set:html={item.desc} />
@@ -186,27 +186,27 @@ const { tech } = Astro.props;
 }
 
 function generateConceptSection(
-	content: Record<string, any>,
-	components: string[]
+	_content: Record<string, any>,
+	_components: string[]
 ): string {
 	return `---
 /**
  * コンセプトセクションコンポーネント
  */
 interface Props {
-	concept: {
+	data: {
 		ttl: string;
 		desc: string;
 	};
 }
 
-const { concept } = Astro.props;
+const { data } = Astro.props;
 ---
 
 <section class="concept_section">
 	<div class="contentInner">
-		<h2 class="section_ttl" set:html={concept.ttl} />
-		<p class="section_desc" set:html={concept.desc} />
+		<h2 class="section_ttl" set:html={data.ttl} />
+		<p class="section_desc" set:html={data.desc} />
 	</div>
 </section>
 `;
@@ -214,26 +214,26 @@ const { concept } = Astro.props;
 
 function generateCustomSection(
 	type: string,
-	content: Record<string, any>,
-	components: string[]
+	_content: Record<string, any>,
+	_components: string[]
 ): string {
 	return `---
 /**
  * ${type} セクションコンポーネント
  */
 interface Props {
-	${type}: {
+	data: {
 		ttl: string;
 		items?: any[];
 	};
 }
 
-const { ${type} } = Astro.props;
+const { data } = Astro.props;
 ---
 
 <section class="${type}_section">
 	<div class="contentInner">
-		<h2 class="section_ttl" set:html={${type}.ttl} />
+		<h2 class="section_ttl" set:html={data.ttl} />
 		{/* カスタムコンテンツをここに追加 */}
 	</div>
 </section>

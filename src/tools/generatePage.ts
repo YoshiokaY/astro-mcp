@@ -10,8 +10,10 @@ import {
   type ScssVariablesConfig,
   updateScssVariables,
 } from "../editors/scssVariablesEditor.js";
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { resolve } from "path";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { resolve, dirname } from "path";
+import { getGenerationContext } from "../utils/projectContext.js";
+import { validateName, assertPathWithinProject } from "../utils/security.js";
 
 interface PageArgs {
   pageName: string;
@@ -52,6 +54,10 @@ export async function generatePage(args: any) {
   } = args as PageArgs;
 
   try {
+    // 入力バリデーション
+    validateName(pageName, "ページ名");
+    sections.forEach((s) => validateName(s, "セクション名"));
+
     const updateLogs: string[] = [];
 
     // ページタイプ自動判定
@@ -125,7 +131,22 @@ export async function generatePage(args: any) {
       }
     }
 
-    // 3. ページテンプレート生成
+    // 3. セクションファイルの存在チェック
+    const missingSections = sections.filter((section) => {
+      const partPath = resolve(
+        projectRoot,
+        `src/pages/_parts/_${pageName}/_${section}.astro`
+      );
+      return !existsSync(partPath);
+    });
+
+    if (missingSections.length > 0) {
+      updateLogs.push(
+        `⚠️ 以下のセクションファイルが未作成です:\n${missingSections.map((s) => `  - _${s}.astro`).join("\n")}\n  → 先に generate-section で作成することを推奨します`
+      );
+    }
+
+    // 4. ページテンプレート生成
     const pageCode = generatePageTemplate({
       pageName,
       pageType,
@@ -136,21 +157,34 @@ export async function generatePage(args: any) {
     // コード整形
     const formatted = await formatCode(pageCode, "astro");
 
+    // 5. ファイルパス解決 & 境界チェック
+    const pagePath = resolve(projectRoot, `src/pages/${pageName}/index.astro`);
+    assertPathWithinProject(pagePath, projectRoot);
+
+    // 6. ページファイル書き込み
+    try {
+      mkdirSync(dirname(pagePath), { recursive: true });
+      writeFileSync(pagePath, formatted, "utf-8");
+      updateLogs.push(`✅ ページファイル出力: ${pagePath}`);
+    } catch (writeError) {
+      updateLogs.push(`❌ ページファイル書き込みエラー: ${writeError}`);
+    }
+
     // 結果メッセージの構築
     const updateSection =
       updateLogs.length > 0
-        ? `### サイト設定更新\n${updateLogs.join("\n")}\n\n`
+        ? `### プロジェクト更新\n${updateLogs.join("\n")}\n\n`
         : "";
 
     return {
       content: [
         {
           type: "text",
-          text: `${updateSection}### ページ生成\n✅ ページ「${pageName}」を生成しました\n\n\`\`\`astro\n${formatted}\n\`\`\`\n\n### 配置先\n- \`src/pages/${pageName}/index.astro\`\n\n### 必要なセクション\n${sections.map((s) => `- \`src/pages/_parts/_${pageName}/_${s}.astro\``).join("\n")}`,
+          text: `${updateSection}### ページ生成\n✅ ページ「${pageName}」を生成しました\n\n\`\`\`astro\n${formatted}\n\`\`\`\n\n### 必要なセクション\n${sections.map((s) => `- \`src/pages/_parts/_${pageName}/_${s}.astro\``).join("\n")}${getGenerationContext(projectRoot)}`,
         },
       ],
     };
   } catch (error) {
-    throw new Error(`ページ生成エラー: ${error}`);
+    throw new Error(`ページ生成エラー: ${error}`, { cause: error });
   }
 }

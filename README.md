@@ -10,8 +10,21 @@
 
 - ✅ **コンポーネント生成**: Props定義から再利用可能なAstroコンポーネントを生成
 - ✅ **セクション生成**: コンテンツデータから`_parts`配下のセクションを生成
+  - **NEW**: SCSS自動生成（astro-dev mixinに準拠）
+  - **NEW**: app.js自動更新（Tab/Accordion等のスクリプト登録）
 - ✅ **ページ生成**: ページ構造全体を一括生成
 - ✅ **スキーマ生成**: Excel/Markdown/JSONからTypeScript型定義を自動生成
+
+### v0.2.0の主な改善点
+
+**astro-devプロジェクトでの実際の使用経験から、以下の課題を解決しました:**
+
+1. ✅ **既存スクリプトの活用**: Tab.ts、Accordion.ts等のastro-dev既存スクリプトを使用
+2. ✅ **Mixinの使用**: `@include mq()`、`@include hover()`を使用したSCSS生成
+3. ✅ **.contentInner二重設定の防止**: 柔軟なコンテナ制御
+4. ✅ **スタイル分離**: Astroファイルではなく、SCSSファイルに分離
+
+詳細は [IMPROVEMENTS.md](./IMPROVEMENTS.md) を参照してください。
 
 ## インストール
 
@@ -134,21 +147,12 @@ Props:
 
 ---
 
-### 2. セクション生成
+### 2. セクション生成（改善版）
 
 **プロンプト例**:
 
 ```
-sampleページ用のarticlesセクションを生成してください。
-
-コンテンツ:
-- タイトル: 最新記事
-- 記事数: 4件
-- 各記事にタイトル、説明文、投稿日、カテゴリ、画像が必要
-
-使用コンポーネント:
-- Picture
-- SetTime
+recruitページでQ&Aをアコーディオンで実装してください。
 ```
 
 **実行されるMCPツール**:
@@ -157,20 +161,38 @@ sampleページ用のarticlesセクションを生成してください。
 {
 	"name": "generate-section",
 	"arguments": {
-		"sectionType": "articles",
-		"pageName": "sample",
+		"prompt": "Q&Aをアコーディオンで実装",
+		"pageName": "recruit",
 		"content": {
-			"ttl": "最新記事",
-			"items": []
+			"ttl": "よくある質問",
+			"items": [
+				{ "ttl": "質問1", "content": "回答1" },
+				{ "ttl": "質問2", "content": "回答2" }
+			]
 		},
-		"components": ["Picture", "SetTime"]
+		"generateScss": true,
+		"scssOptions": {
+			"spacing": {
+				"sectionPadding": "6rem 0",
+				"itemGap": "1.6rem"
+			}
+		}
 	}
 }
 ```
 
 **出力**:
 
-- `src/pages/_parts/_sample/_articles.astro`
+- `src/pages/_parts/_recruit/_qa.astro` (Astroコンポーネント)
+- SCSSコード（`src/scss/pages/_recruit.scss`に追記）
+- `src/js/app.js` 自動更新（Accordion.tsを追加）
+
+**生成されるコードの特徴**:
+
+✅ **既存スクリプトを使用**: astro-devの`Accordion.ts`を活用
+✅ **Mixinを使用**: `@include mq()`、`@include hover()`、`@include fontsize()`
+✅ **コンテナ制御**: `.contentInner`の二重設定を防止
+✅ **スタイル分離**: SCSSファイルに分離（Astroファイル内に`<style>`なし）
 
 ---
 
@@ -369,7 +391,32 @@ astro-mcp/
 
 ---
 
-## サポートするセクションタイプ
+## サポートするUIパターン
+
+### インタラクティブパターン（スクリプト連携）
+
+- **`tab`**: タブUI（Tab.ts連携）
+  - 自動的に`app.js`に`Tab.ts`を登録
+  - ARIA属性・キーボード操作対応
+- **`accordion`**: アコーディオンUI（Accordion.ts連携）
+  - 自動的に`app.js`に`Accordion.ts`を登録
+  - 高さアニメーション・フォーカス管理
+- **`modal`**: モーダルギャラリー（Modal.ts連携）
+  - 自動的に`app.js`に`Modal.ts`を登録
+  - 動画/画像/カスタムdialog対応
+
+### 静的パターン
+
+- **`grid`**: グリッドレイアウト
+  - レスポンシブカラム数制御
+  - 画像サポート（Pictureコンポーネント対応）
+- **`carousel`**: カルーセル
+  - Swiper.js連携想定
+  - 自動再生オプション
+- **`list`**: シンプルリスト
+  - 基本的な情報表示
+
+### セクションタイプ
 
 - `hero`: ヒーローセクション
 - `articles`: 記事一覧

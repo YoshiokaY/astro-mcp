@@ -83,8 +83,8 @@ function extractUIOptions(content: any): any {
 }
 
 function generateHeroSection(
-	content: Record<string, any>,
-	components: string[]
+	_content: Record<string, any>,
+	_components: string[]
 ): string {
 	return `---
 /**
@@ -114,8 +114,8 @@ const { data } = Astro.props;
 }
 
 function generateFeaturesSection(
-	content: Record<string, any>,
-	components: string[]
+	_content: Record<string, any>,
+	_components: string[]
 ): string {
 	return `---
 /**
@@ -145,8 +145,8 @@ const { data } = Astro.props;
 }
 
 function generateTechSection(
-	content: Record<string, any>,
-	components: string[]
+	_content: Record<string, any>,
+	_components: string[]
 ): string {
 	return `---
 /**
@@ -186,8 +186,8 @@ const { data } = Astro.props;
 }
 
 function generateConceptSection(
-	content: Record<string, any>,
-	components: string[]
+	_content: Record<string, any>,
+	_components: string[]
 ): string {
 	return `---
 /**
@@ -214,8 +214,8 @@ const { data } = Astro.props;
 
 function generateCustomSection(
 	type: string,
-	content: Record<string, any>,
-	components: string[]
+	_content: Record<string, any>,
+	_components: string[]
 ): string {
 	return `---
 /**

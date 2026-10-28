@@ -79,7 +79,7 @@ export function updateAppJs(
 	});
 
 	// app.jsの構造を解析して適切な位置に挿入
-	let result = originalContent;
+	let result: string;
 
 	// 1. import文の追加
 	// findLastIndex相当の処理（ES2023未満でも動作）

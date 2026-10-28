@@ -39,7 +39,7 @@ export async function parseExcel(filePath: string): Promise<any> {
     // データ構造を推測して整形
     return inferStructureFromExcel(data);
   } catch (error) {
-    throw new Error(`Excel解析エラー: ${error}`);
+    throw new Error(`Excel解析エラー: ${error}`, { cause: error });
   }
 }
 

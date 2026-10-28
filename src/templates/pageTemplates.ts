@@ -19,7 +19,7 @@ interface PageConfig {
  */
 export function generatePageTemplate(config: PageConfig): string {
   const { pageName, pageType, pageData, sections } = config;
-  const { head, breadcrumbs, contents } = pageData;
+  const { breadcrumbs } = pageData;
 
   // ページタイプ判定（明示指定がなければbreadcrumbsの有無で判定）
   const isLowerPage = pageType === 'lower' || !!breadcrumbs;
@@ -88,7 +88,7 @@ function generateSectionComponents(
   sections: string[]
 ): string {
   return sections
-    .map((section, index) => {
+    .map((section) => {
       const componentName = toPascalCase(section) + "Section";
       const props = `data={page.contents.${section}}`;
       const additionalProps =

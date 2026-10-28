@@ -191,6 +191,6 @@ export async function generateSection(args: any) {
 			],
 		};
 	} catch (error) {
-		throw new Error(`セクション生成エラー: ${error}`);
+		throw new Error(`セクション生成エラー: ${error}`, { cause: error });
 	}
 }

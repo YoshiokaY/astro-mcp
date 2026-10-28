@@ -323,7 +323,7 @@ class AstroGeneratorServer {
 使用例:
 {
   "sourceType": "json",
-  "sourceData": "{ \"title\": \"記事タイトル\", \"items\": [...] }",
+  "sourceData": "{ "title": "記事タイトル", "items": [...] }",
   "schemaName": "ArticleData"
 }`,
           inputSchema: {

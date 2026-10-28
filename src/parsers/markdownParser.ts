@@ -14,7 +14,7 @@ export async function parseMarkdown(content: string): Promise<any> {
       structure: inferStructureFromMarkdown(body),
     };
   } catch (error) {
-    throw new Error(`Markdown解析エラー: ${error}`);
+    throw new Error(`Markdown解析エラー: ${error}`, { cause: error });
   }
 }
 

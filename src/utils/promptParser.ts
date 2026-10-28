@@ -184,7 +184,7 @@ export function parsePageIntent(
 	pageName?: string
 ): ParsedPageIntent {
 	const normalizedPrompt = prompt.toLowerCase();
-	let confidence = 0.5;
+	let confidence: number;
 
 	// 下層ページキーワード
 	const lowerKeywords = [

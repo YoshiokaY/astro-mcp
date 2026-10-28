@@ -4,7 +4,7 @@
  */
 export async function formatCode(
   code: string,
-  parser: "astro" | "scss" | "typescript"
+  _parser: "astro" | "scss" | "typescript"
 ): Promise<string> {
   // 簡易的な整形処理
   // 生成されたコードをそのまま返す

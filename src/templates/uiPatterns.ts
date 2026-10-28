@@ -3,8 +3,6 @@
  * コンテンツデータとUIパターンを受け取り、適切なマークアップを生成
  */
 
-import { getContainerClass, getButtonClass } from '../utils/astroDevClasses.js';
-
 export type UIPattern =
 	| 'tab' // タブUI(開発環境のTab.ts連携)
 	| 'accordion' // アコーディオンUI(Accordion.ts連携)

@@ -62,7 +62,6 @@ export function parseCommonAstro(content: string): {
   }
 
   // menu セクションの抽出（簡易版、実際のパースは複雑）
-  const menuMatch = content.match(/menu:\s*\[([^\]]+)\]/s);
   const menu: MenuItem[] = [];
 
   // 既存の完全なコンテンツを保持

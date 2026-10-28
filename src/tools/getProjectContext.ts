@@ -1,5 +1,5 @@
 import { readFileSync, existsSync, readdirSync, statSync } from "fs";
-import { resolve, relative } from "path";
+import { resolve } from "path";
 import { assertPathWithinProject, escapeRegExp } from "../utils/security.js";
 
 interface ProjectContextArgs {

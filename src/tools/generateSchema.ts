@@ -60,7 +60,7 @@ export async function generateSchema(args: any) {
       ],
     };
   } catch (error) {
-    throw new Error(`スキーマ生成エラー: ${error}`);
+    throw new Error(`スキーマ生成エラー: ${error}`, { cause: error });
   }
 }
 

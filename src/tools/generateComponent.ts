@@ -89,7 +89,7 @@ export async function generateComponent(args: any) {
       ],
     };
   } catch (error) {
-    throw new Error(`コンポーネント生成エラー: ${error}`);
+    throw new Error(`コンポーネント生成エラー: ${error}`, { cause: error });
   }
 }
 

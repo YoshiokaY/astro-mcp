@@ -185,6 +185,6 @@ export async function generatePage(args: any) {
       ],
     };
   } catch (error) {
-    throw new Error(`ページ生成エラー: ${error}`);
+    throw new Error(`ページ生成エラー: ${error}`, { cause: error });
   }
 }
